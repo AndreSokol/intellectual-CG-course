@@ -3,6 +3,7 @@
 #include <vector>
 #include "Vec3.h"
 #include "Sphere.h"
+#include <math.h>
 
 int WIDTH = 900,
     HEIGHT = 600,
@@ -125,7 +126,12 @@ int main(int argc, char *argv[])
 
     SDL_RenderPresent(renderer);
 
-    SDL_Delay(3000);
+    SDL_Event event;
+    while (SDL_WaitEvent(&event) >= 0) {
+        if (event.type == SDL_QUIT) {
+            break;
+        }
+    }
 
     SDL_DestroyWindow(window);
     SDL_Quit();
