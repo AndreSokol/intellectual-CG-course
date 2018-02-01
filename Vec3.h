@@ -17,16 +17,28 @@ public:
         this->z = z;
     }
 
-    Vec3 operator+ (const Vec3 &other) const;
-    Vec3 operator- (const Vec3 &other) const;
-    Vec3 operator* (const double &other) const;
-    //Vec3 operator* (int other, Vec3 self);
+    const Vec3 reflectOver(const Vec3 &other) const;
 
-    Vec3 reflectOver(const Vec3 &other) const;
+
+    friend const Vec3 operator*(const double &a, const Vec3 &v) {
+        return Vec3(v.x * a, v.y * a, v.z * a);
+    }
+    friend const Vec3 operator+(const Vec3 &a, const Vec3 &b) {
+        return Vec3(a.x + b.x, a.y + b.y, a.z + b.z);
+    }
+    friend const Vec3 operator-(const Vec3 &a, const Vec3 &b) {
+        return a + (-1 * b);
+    }
+    const Vec3 operator*(const double &a) {
+        return a * *this;
+    }
+
+    Vec3& operator*= (const double &a);
 
     double length() const;
 };
 
+Vec3 normalize(const Vec3 &v);
 double dot(const Vec3 &a, const Vec3 &b);
 double cos(const Vec3 &a, const Vec3 &b);
 

@@ -4,15 +4,19 @@
 #include "Vec3.h"
 #include "Sphere.h"
 #include <math.h>
+#include "PointLight.h"
 
 int WIDTH = 900,
     HEIGHT = 600,
     D = 1,
     REFLECT_DEPTH_LIMIT = 2;
-double CLIPPING_DIST = 10000000.0;
+double CLIPPING_DIST = 10000.0,
+       FLOAT_PRECISION = 1e-6;
 
 Color BACKGROUND_COLOR = Color(0, 0, 0);//Color(29, 33, 36);
+Color AMBIENT = Color(0, 5, 10);
 std::vector<Sphere> spheres;
+std::vector<PointLight> lightSources;
 
 
 inline double max(const double &a, const double &b) {
@@ -63,17 +67,34 @@ bool findIntersection(const Vec3 &O, const Vec3 &R,
 
         if (!is_intersected) continue;
 
-        if (t0 < closest_t && t0 >= 0) {
+        if (t0 < closest_t && t0 > FLOAT_PRECISION) {
             closest_t = t0;
             closest_sphere = i;
         }
-        if (t1 < closest_t && t1 >= 0) {
+        if (t1 < closest_t && t1 > FLOAT_PRECISION) {
             closest_t = t1;
             closest_sphere = i;
         }
     }
 
-    return (closest_t != CLIPPING_DIST);
+    return closest_t < CLIPPING_DIST - FLOAT_PRECISION;
+}
+
+
+Color calculateLighting(const Vec3 &P, const Vec3 &V, Sphere sph) {
+    Vec3 R = lightSources[0].position - P;
+    Vec3 N = P - sph.center;
+
+    Color I = AMBIENT;
+
+    double t;
+    int sph_id;
+    bool is_in_shadow = findIntersection(P, R, t, sph_id);
+    if (!is_in_shadow) {
+        I = AMBIENT + sph.color * max(cos(N, R), 0) + Color(255, 255, 255) * pow(cos(R.reflectOver(N), V), sph.specular);
+    }
+
+    return I;
 }
 
 
@@ -85,15 +106,7 @@ Color traceRay(const Vec3 &O, const Vec3 &R) {
 
     if (!is_intersected) return BACKGROUND_COLOR;
 
-    Color c;
-
-    // if depth map
-    double temp = 20.0;
-    double comp = pow(max(0.0, temp - t) / temp, 3.0) * 255.0;
-    c = Color(comp, comp, comp);
-
-    // if normal render
-    c = spheres[sph_id].color;
+    Color c = calculateLighting(t * R, R, spheres[sph_id]);
     return c;
 }
 
@@ -104,10 +117,16 @@ int main(int argc, char *argv[])
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
     SDL_RenderClear(renderer);
 
-    spheres.push_back(Sphere(0, -1, 5, 1, Color(242, 76, 39), 10, 0.9));
-    spheres.push_back(Sphere(-1, 1, 6, 1, Color(86, 185, 208), 500, 0.3));
-    spheres.push_back(Sphere(2, 1, 5, 1, Color(242, 76, 39), 10, 0));
-    spheres.push_back(Sphere(0, -5001, 0, 5000, Color(251, 186, 66), 1000, 0.1));
+//    spheres.push_back(Sphere(0, -1, 5, 1, Color(242, 76, 39), 10, 0.9));
+//    spheres.push_back(Sphere(-1, 1, 6, 1, Color(86, 185, 208), 500, 0.3));
+//    spheres.push_back(Sphere(2, 1, 5, 1, Color(242, 76, 39), 10, 0));
+    spheres.push_back(Sphere(0, -5002, 0, 5000, Color(251, 186, 66), 1000, 0.1));
+
+    spheres.push_back(Sphere(-2, -0.5, 7, 1, Color(242, 76, 39), 10, 0.9));
+    spheres.push_back(Sphere(0, -0.5, 9, 1, Color(86, 185, 208), 500, 0.3));
+    spheres.push_back(Sphere(2, -0.5, 7, 1, Color(242, 76, 39), 10, 0));
+
+    lightSources.push_back(PointLight(Vec3(0, 1, 6), Color(255, 255, 255)));
 
     Vec3 O = Vec3(0, 0, 0);
     double biggest_window_side = max(WIDTH, HEIGHT);
@@ -122,6 +141,7 @@ int main(int argc, char *argv[])
             SDL_SetRenderDrawColor(renderer, c.r(), c.g(), c.b(), SDL_ALPHA_OPAQUE);
             SDL_RenderDrawPoint(renderer, i, j);
         }
+        SDL_RenderPresent(renderer);
     }
 
     SDL_RenderPresent(renderer);

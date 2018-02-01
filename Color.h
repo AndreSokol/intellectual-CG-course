@@ -14,6 +14,14 @@ public:
     Color():Vec3() {};
     Color(double x, double y, double z):Vec3(x / 255.0, y / 255.0, z / 255.0){};
     Color(Vec3 vec):Vec3(vec) {};
+    //static Color fill(int R, int G, int B) {return Color()}
+
+    Color& operator+=(const Color &other) {
+        this->x += other.x;
+        this->y += other.y;
+        this->z += other.z;
+        return *this;
+    }
 
     uint8_t r() {
         return this->normalize_color_component(this->x);
