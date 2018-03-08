@@ -2,16 +2,15 @@
 #include <random>
 #include <vector>
 #include "Vec3.h"
-#include "Sphere.h"
+#include "primitives/Sphere.h"
 #include <math.h>
 #include "PointLight.h"
+#include "Material.h"
 
 int WIDTH = 900,
     HEIGHT = 600,
     D = 1,
     REFLECT_DEPTH_LIMIT = 2;
-double CLIPPING_DIST = 10000.0,
-       FLOAT_PRECISION = 1e-6;
 
 Color BACKGROUND_COLOR = Color(0, 0, 0);//Color(29, 33, 36);
 Color AMBIENT = Color(0, 5, 10);
@@ -39,40 +38,36 @@ void StoW(const int &Sx, const int &Sy, double &Cx, double &Cy) {
     return;
 }
 
-
-bool intersectRaySphere(const Vec3 &O, const Vec3 &R, const Sphere &sphere, double &t0, double &t1) {
-    Vec3 C = O - sphere.center;
-
-    double k1 = dot(R, R),
-            k2 = 2 * dot(C, R),
-            k3 = dot(C, C) - sphere.radius * sphere.radius;
-
-    double det = k2 * k2 - 4 * k1 * k3;
-    if (det < 0) return false;
-
-    t0 = (-k2 - sqrt(det)) / 2 / k1;
-    t1 = (-k2 + sqrt(det)) / 2 / k1;
-    return true;
-}
+//
+// bool intersectRaySphere(const Vec3 &O, const Vec3 &R, const Sphere &sphere, double &t0, double &t1) {
+//     Vec3 C = O - sphere.center;
+//
+//     double k1 = dot(R, R),
+//             k2 = 2 * dot(C, R),
+//             k3 = dot(C, C) - sphere.radius * sphere.radius;
+//
+//     double det = k2 * k2 - 4 * k1 * k3;
+//     if (det < 0) return false;
+//
+//     t0 = (-k2 - sqrt(det)) / 2 / k1;
+//     t1 = (-k2 + sqrt(det)) / 2 / k1;
+//     return true;
+// }
 
 
 bool findIntersection(const Vec3 &O, const Vec3 &R,
                       double &closest_t, int &closest_sphere) {
-    double t0, t1;
+    double t;
     bool is_intersected;
     closest_t = CLIPPING_DIST;
 
     for(size_t i = 0; i < spheres.size(); i += 1) {
-        is_intersected = intersectRaySphere(O, R, spheres[i], t0, t1);
+        is_intersected = spheres[i].intersect(O, R, t);
 
         if (!is_intersected) continue;
 
-        if (t0 < closest_t && t0 > FLOAT_PRECISION) {
-            closest_t = t0;
-            closest_sphere = i;
-        }
-        if (t1 < closest_t && t1 > FLOAT_PRECISION) {
-            closest_t = t1;
+        if (t < closest_t && t > FLOAT_PRECISION) {
+            closest_t = t;
             closest_sphere = i;
         }
     }
@@ -91,7 +86,9 @@ Color calculateLighting(const Vec3 &P, const Vec3 &V, Sphere sph) {
     int sph_id;
     bool is_in_shadow = findIntersection(P, R, t, sph_id);
     if (!is_in_shadow) {
-        I = AMBIENT + sph.color * max(cos(N, R), 0) + Color(255, 255, 255) * pow(cos(R.reflectOver(N), V), sph.specular);
+        Material mat = sph.mat;
+        I = AMBIENT + mat.diffuseColor * max(cos(N, R), 0) +
+                            Color(255, 255, 255) * pow(cos(R.reflectOver(N), V), mat.specular);
     }
 
     return I;
@@ -120,11 +117,23 @@ int main(int argc, char *argv[])
 //    spheres.push_back(Sphere(0, -1, 5, 1, Color(242, 76, 39), 10, 0.9));
 //    spheres.push_back(Sphere(-1, 1, 6, 1, Color(86, 185, 208), 500, 0.3));
 //    spheres.push_back(Sphere(2, 1, 5, 1, Color(242, 76, 39), 10, 0));
-    spheres.push_back(Sphere(0, -5002, 0, 5000, Color(251, 186, 66), 1000, 0.1));
+    spheres.push_back(Sphere(
+        Vec3(0, -5002, 0), 5000,
+        Material(Color(251, 186, 66), 1000, 0.1)
+    ));
 
-    spheres.push_back(Sphere(-2, -0.5, 7, 1, Color(242, 76, 39), 10, 0.9));
-    spheres.push_back(Sphere(0, -0.5, 9, 1, Color(86, 185, 208), 500, 0.3));
-    spheres.push_back(Sphere(2, -0.5, 7, 1, Color(242, 76, 39), 10, 0));
+    spheres.push_back(Sphere(
+        Vec3(-2, -0.5, 7), 1,
+        Material(Color(242, 76, 39), 10, 0.9)
+    ));
+    spheres.push_back(Sphere(
+        Vec3(0, -0.5, 9), 1,
+        Material(Color(86, 185, 208), 500, 0.3)
+    ));
+    spheres.push_back(Sphere(
+        Vec3(2, -0.5, 7), 1,
+        Material(Color(242, 76, 39), 10, 0)
+    ));
 
     lightSources.push_back(PointLight(Vec3(0, 1, 6), Color(255, 255, 255)));
 
