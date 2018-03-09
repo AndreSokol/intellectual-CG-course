@@ -6,49 +6,54 @@
 #include "../gl_const.h"
 
 class Triangle : public BasePrimitive {
+private:
+
 public:
     Vec3 A = Vec3(0, 0, 0);
     Vec3 B = Vec3(0, 0, 0);
     Vec3 C = Vec3(0, 0, 0);
+    Vec3 N = Vec3(1, 0, 0);
 
     Triangle() {};
-    Triangle(const Vec3 &A, const Vec3 &B, const Vec3 &C, const Material &mat) {
+    Triangle(const Vec3 &A, const Vec3 &B, const Vec3 &C, const Vec3 &N, const Material &mat) {
         this->A = A;
         this->B = B;
         this->C = C;
+        this->N = N;
         this->mat = mat;
     };
 
     Vec3 normal(const Vec3 &P) {
-        return normalize(P - this->center);
+        return this->N;
     };
 
     bool intersect(const Vec3 &O, const Vec3 &R, double &t) {
-        Vec3 C = O - this->center;
+        Vec3 P = this->C - this->A;
+        Vec3 Q = this->B - this->A;
+        Vec3 S = this->A - O;
 
-        double k1 = dot(R, R),
-                k2 = 2 * dot(C, R),
-                k3 = dot(C, C) - this->radius * this->radius;
 
-        double det = k2 * k2 - 4 * k1 * k3;
-        if (det < 0) return false;
-
-        double t0 = (-k2 - sqrt(det)) / 2 / k1;
-        double t1 = (-k2 + sqrt(det)) / 2 / k1;
-
-        if (t0 > FLOATING_PRECISION && t0 < CLIPPING_DIST) {
-            t = t0;
-            return true;
+        double det = matrixDet(P, Q, -R);
+        if (det == 0) {
+            return false;
         }
 
-        if (t1 > FLOATING_PRECISION && t1 < CLIPPING_DIST) {
-            t = t1;
-            return true;
+        double alpha = matrixDet(-S, Q, -R) / det;
+        double beta = matrixDet(P, -S, -R) / det;
+        double gamma = matrixDet(P, Q, -S) / det;
+
+        if (alpha < - FLOAT_PRECISION || beta < - FLOAT_PRECISION || alpha + beta > 1 + FLOAT_PRECISION) {
+            return false;
         }
 
-        return false;
+        t = gamma;
+        return true;
     }
 
+    double matrixDet(const Vec3 &I, const Vec3 &J, const Vec3 &K) {
+        return I.x * J.y * K.z + J.x * K.y * I.z + K.x * I.y * J.z - (
+               I.x * K.y * J.z + J.x * I.y * K.z + K.x * J.y * I.z);
+    }
 };
 
 

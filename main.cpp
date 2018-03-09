@@ -3,18 +3,23 @@
 #include <vector>
 #include "Vec3.h"
 #include "primitives/Sphere.h"
+#include "primitives/Triangle.h"
+#include "primitives/BasePrimitive.h"
 #include <math.h>
 #include "PointLight.h"
 #include "Material.h"
 
-int WIDTH = 900,
-    HEIGHT = 600,
+#include <cstdlib>
+#include <iostream>
+
+int WIDTH = 1366,
+    HEIGHT = 740,
     D = 1,
     REFLECT_DEPTH_LIMIT = 2;
 
 Color BACKGROUND_COLOR = Color(0, 0, 0);//Color(29, 33, 36);
 Color AMBIENT = Color(0, 5, 10);
-std::vector<Sphere> spheres;
+std::vector<Triangle> spheres;
 std::vector<PointLight> lightSources;
 
 
@@ -76,9 +81,9 @@ bool findIntersection(const Vec3 &O, const Vec3 &R,
 }
 
 
-Color calculateLighting(const Vec3 &P, const Vec3 &V, Sphere sph) {
+Color calculateLighting(const Vec3 &P, const Vec3 &V, Triangle sph) {
     Vec3 R = lightSources[0].position - P;
-    Vec3 N = P - sph.center;
+    Vec3 N = sph.normal(P);
 
     Color I = AMBIENT;
 
@@ -100,42 +105,43 @@ Color traceRay(const Vec3 &O, const Vec3 &R) {
     int sph_id;
 
     bool is_intersected = findIntersection(O, R, t, sph_id);
-
     if (!is_intersected) return BACKGROUND_COLOR;
 
     Color c = calculateLighting(t * R, R, spheres[sph_id]);
     return c;
 }
 
+void loadGeometry() {
+    Vec3 A = Vec3(1.135053, -0.131832, 6.269258);
+    Vec3 B = Vec3(-0.420450, -0.418204, 6.162949);
+    Vec3 C = Vec3(-0.065169, 1.113089, 6.367437);
+    Vec3 D = Vec3(0.191465, 0.273355, 4.874459);
+
+    Vec3 P = Vec3(100, -2, 100);
+    Vec3 Q = Vec3(-100, -2, 100);
+    Vec3 R = Vec3(-100, -2, -100);
+    Vec3 S = Vec3(100, -2, -100);
+
+    Material mat = Material(Color(242, 76, 39), 10, 0);
+
+    spheres.push_back(Triangle(P, Q, R, Vec3(0, 1, 0), mat));
+    spheres.push_back(Triangle(S, Q, R, Vec3(0, 1, 0), mat));
+    spheres.push_back(Triangle(C, B, D, Vec3(-0.919400, 0.253500, 0.300600), mat));
+    spheres.push_back(Triangle(A, B, C, Vec3(-0.045300, -0.121900, -0.991500), mat));
+    spheres.push_back(Triangle(D, B, A, Vec3(0.192400, -0.899800, 0.391600), mat));
+    spheres.push_back(Triangle(A, C, D, Vec3(0.683700, 0.680000, 0.265000), mat));
+}
+
 int main(int argc, char *argv[])
 {
     SDL_Init(SDL_INIT_VIDEO);
-    SDL_Window *window = SDL_CreateWindow("Stupid Renderer", 100, 100, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
+    SDL_Window *window = SDL_CreateWindow("Stupid Renderer", 0, 0, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
     SDL_RenderClear(renderer);
 
-//    spheres.push_back(Sphere(0, -1, 5, 1, Color(242, 76, 39), 10, 0.9));
-//    spheres.push_back(Sphere(-1, 1, 6, 1, Color(86, 185, 208), 500, 0.3));
-//    spheres.push_back(Sphere(2, 1, 5, 1, Color(242, 76, 39), 10, 0));
-    spheres.push_back(Sphere(
-        Vec3(0, -5002, 0), 5000,
-        Material(Color(251, 186, 66), 1000, 0.1)
-    ));
+    loadGeometry();
 
-    spheres.push_back(Sphere(
-        Vec3(-2, -0.5, 7), 1,
-        Material(Color(242, 76, 39), 10, 0.9)
-    ));
-    spheres.push_back(Sphere(
-        Vec3(0, -0.5, 9), 1,
-        Material(Color(86, 185, 208), 500, 0.3)
-    ));
-    spheres.push_back(Sphere(
-        Vec3(2, -0.5, 7), 1,
-        Material(Color(242, 76, 39), 10, 0)
-    ));
-
-    lightSources.push_back(PointLight(Vec3(0, 1, 6), Color(255, 255, 255)));
+    lightSources.push_back(PointLight(Vec3(1, 1, 1), Color(255, 255, 255)));
 
     Vec3 O = Vec3(0, 0, 0);
     double biggest_window_side = max(WIDTH, HEIGHT);

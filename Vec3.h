@@ -34,6 +34,9 @@ public:
     }
 
     Vec3& operator*= (const double &a);
+    Vec3 operator- () const {
+        return -1 * *this;
+    };
 
     double length() const;
 };
