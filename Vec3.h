@@ -44,5 +44,6 @@ public:
 Vec3 normalize(const Vec3 &v);
 double dot(const Vec3 &a, const Vec3 &b);
 double cos(const Vec3 &a, const Vec3 &b);
+double pcos(const Vec3 &a, const Vec3 &b);
 
 #endif //STUPID_RENDER_VEC3_H

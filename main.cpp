@@ -43,22 +43,6 @@ void StoW(const int &Sx, const int &Sy, double &Cx, double &Cy) {
     return;
 }
 
-//
-// bool intersectRaySphere(const Vec3 &O, const Vec3 &R, const Sphere &sphere, double &t0, double &t1) {
-//     Vec3 C = O - sphere.center;
-//
-//     double k1 = dot(R, R),
-//             k2 = 2 * dot(C, R),
-//             k3 = dot(C, C) - sphere.radius * sphere.radius;
-//
-//     double det = k2 * k2 - 4 * k1 * k3;
-//     if (det < 0) return false;
-//
-//     t0 = (-k2 - sqrt(det)) / 2 / k1;
-//     t1 = (-k2 + sqrt(det)) / 2 / k1;
-//     return true;
-// }
-
 
 bool findIntersection(const Vec3 &O, const Vec3 &R,
                       double &closest_t, int &closest_sphere) {
@@ -92,8 +76,9 @@ Color calculateLighting(const Vec3 &P, const Vec3 &V, Triangle sph) {
     bool is_in_shadow = findIntersection(P, R, t, sph_id);
     if (!is_in_shadow) {
         Material mat = sph.mat;
-        I = AMBIENT + mat.diffuseColor * max(cos(N, R), 0) +
-                            Color(255, 255, 255) * pow(cos(R.reflectOver(N), V), mat.specular);
+        I = AMBIENT;
+        I += mat.diffuseColor * pcos(N, R);
+        I += Color(255, 255, 255) * pow(pcos(R, V), mat.specular);
     }
 
     return I;
@@ -107,9 +92,10 @@ Color traceRay(const Vec3 &O, const Vec3 &R) {
     bool is_intersected = findIntersection(O, R, t, sph_id);
     if (!is_intersected) return BACKGROUND_COLOR;
 
-    Color c = calculateLighting(t * R, R, spheres[sph_id]);
+    Color c = calculateLighting(O + t * R, R, spheres[sph_id]);
     return c;
 }
+
 
 void loadGeometry() {
     Vec3 A = Vec3(1.135053, -0.131832, 6.269258);
@@ -125,12 +111,15 @@ void loadGeometry() {
     Material mat = Material(Color(242, 76, 39), 10, 0);
 
     spheres.push_back(Triangle(P, Q, R, Vec3(0, 1, 0), mat));
-    spheres.push_back(Triangle(S, Q, R, Vec3(0, 1, 0), mat));
+    spheres.push_back(Triangle(P, S, R, Vec3(0, 1, 0), mat));
     spheres.push_back(Triangle(C, B, D, Vec3(-0.919400, 0.253500, 0.300600), mat));
     spheres.push_back(Triangle(A, B, C, Vec3(-0.045300, -0.121900, -0.991500), mat));
     spheres.push_back(Triangle(D, B, A, Vec3(0.192400, -0.899800, 0.391600), mat));
     spheres.push_back(Triangle(A, C, D, Vec3(0.683700, 0.680000, 0.265000), mat));
+
+    lightSources.push_back(PointLight(Vec3(2, 3, 6), Color(255, 255, 255)));
 }
+
 
 int main(int argc, char *argv[])
 {
@@ -141,8 +130,6 @@ int main(int argc, char *argv[])
 
     loadGeometry();
 
-    lightSources.push_back(PointLight(Vec3(1, 1, 1), Color(255, 255, 255)));
-
     Vec3 O = Vec3(0, 0, 0);
     double biggest_window_side = max(WIDTH, HEIGHT);
 
@@ -152,13 +139,12 @@ int main(int argc, char *argv[])
             StoW(i, j, Cx, Cy);
             Vec3 R = Vec3(Cx / biggest_window_side, Cy / biggest_window_side, 1) * D;
 
-            Color c = traceRay(O, R);
+            Color c = traceRay(O, normalize(R));
             SDL_SetRenderDrawColor(renderer, c.r(), c.g(), c.b(), SDL_ALPHA_OPAQUE);
             SDL_RenderDrawPoint(renderer, i, j);
         }
         SDL_RenderPresent(renderer);
     }
-
     SDL_RenderPresent(renderer);
 
     SDL_Event event;

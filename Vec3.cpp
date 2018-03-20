@@ -33,3 +33,9 @@ double dot(const Vec3 &a, const Vec3 &b) {
 double cos(const Vec3 &a, const Vec3 &b) {
     return dot(a, b) / a.length() / b.length();
 }
+
+double pcos(const Vec3 &a, const Vec3 &b) {
+    double cosValue = cos(a, b);
+    if (cosValue > 0) return cosValue;
+    return 0;
+}
