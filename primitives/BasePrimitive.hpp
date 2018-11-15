@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Color.h"
-#include "../Material.h"
+#include "../Color.hpp"
+#include "../Material.hpp"
 #include <vector>
 
 class BasePrimitive {

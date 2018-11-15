@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../Vec3.h"
-#include "../Material.h"
-#include "../gl_const.h"
-#include "BasePrimitive.h"
+#include "../Vec3.hpp"
+#include "../Material.hpp"
+#include "../gl_const.hpp"
+#include "BasePrimitive.hpp"
 
 class Sphere : public BasePrimitive {
 public:

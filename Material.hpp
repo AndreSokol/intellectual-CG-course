@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Color.h"
+#include "Color.hpp"
 
 class Material {
 public:
@@ -10,7 +10,7 @@ public:
 
     Material() {};
 
-    Material(Color diffuseColor, double specular, double reflective) {
+    Material(Color diffuseColor, double specular, double reflective = 0.0) {
         this->diffuseColor = diffuseColor;
         this->specular = specular;
         this->reflective = reflective;

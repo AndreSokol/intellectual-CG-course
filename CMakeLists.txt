@@ -10,5 +10,5 @@ endif ()
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})
 
-add_executable(${PROJECT_NAME} main.cpp Vec3.cpp Vec3.h primitives/Sphere.h Color.h PointLight.h primitives/Triangle.h primitives/BasePrimitive.h gl_const.h Material.h)
+add_executable(${PROJECT_NAME} main.cpp Vec3.cpp Vec3.hpp primitives/Sphere.hpp Color.hpp PointLight.hpp primitives/Triangle.hpp primitives/BasePrimitive.hpp gl_const.hpp Material.hpp utils/geo_loaders.cpp utils/geo_loaders.hpp)
 target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARIES})

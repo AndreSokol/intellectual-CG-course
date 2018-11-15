@@ -1,8 +1,9 @@
 #pragma once
 
-#include "../Vec3.h"
-#include "../Material.h"
-#include "../gl_const.h"
+#include "../Vec3.hpp"
+#include "BasePrimitive.hpp"
+#include "../Material.hpp"
+#include "../gl_const.hpp"
 
 class Triangle : public BasePrimitive {
 private:

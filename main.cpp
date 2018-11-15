@@ -1,23 +1,24 @@
 #include "SDL.h"
 #include <random>
 #include <vector>
-#include "Vec3.h"
-#include "primitives/Sphere.h"
-#include "primitives/Triangle.h"
-#include "primitives/BasePrimitive.h"
+#include "Vec3.hpp"
+#include "primitives/Sphere.hpp"
+#include "primitives/Triangle.hpp"
+#include "primitives/BasePrimitive.hpp"
 #include <math.h>
-#include "PointLight.h"
-#include "Material.h"
+#include "PointLight.hpp"
+#include "Material.hpp"
+#include "utils/geo_loaders.hpp"
 
 #include <cstdlib>
 #include <iostream>
 
-int WIDTH = 1366,
-        HEIGHT = 740,
+int WIDTH = 480,
+        HEIGHT = 320,
         D = 1,
         REFLECT_DEPTH_LIMIT = 2;
 
-Color BACKGROUND_COLOR = Color(0, 0, 0);//Color(29, 33, 36);
+Color BACKGROUND_COLOR = Color(29, 33, 36);
 Color AMBIENT = Color(0, 5, 10);
 std::vector<Triangle> spheres;
 std::vector<PointLight> lightSources;
@@ -98,26 +99,30 @@ Color traceRay(const Vec3 &O, const Vec3 &R) {
 
 
 void loadGeometry() {
-    Vec3 A = Vec3(1.135053, -0.131832, 6.269258);
-    Vec3 B = Vec3(-0.420450, -0.418204, 6.162949);
-    Vec3 C = Vec3(-0.065169, 1.113089, 6.367437);
-    Vec3 D = Vec3(0.191465, 0.273355, 4.874459);
+    std::vector<Material> mats{Material(Color(242, 76, 39), 10),
+                               Material(Color(242, 76, 39), 1000),
+                               Material(Color(242, 76, 39), 0.1)};
+    std::vector<Vec3> positions{Vec3(-2, 0, 8), Vec3(0, 0, 8), Vec3(2, 0, 8)};
 
-    Vec3 P = Vec3(100, -2, 100);
-    Vec3 Q = Vec3(-100, -2, 100);
-    Vec3 R = Vec3(-100, -2, -100);
-    Vec3 S = Vec3(100, -2, -100);
+    lightSources.emplace_back(Vec3(2, 3, 6), Color(255, 255, 255));
+    lightSources.emplace_back(Vec3(2, 4, 6), Color(255, 255, 255));
 
-    Material mat = Material(Color(242, 76, 39), 10, 0);
+    for (auto t: {0, 1, 2}) {
+        const auto &pyramid_tris =
+                geo_loaders::LoadObj("../geometry_samples/wtf.obj", positions[t], mats[t]);
 
-    spheres.push_back(Triangle(P, Q, R, Vec3(0, 1, 0), mat));
-    spheres.push_back(Triangle(P, S, R, Vec3(0, 1, 0), mat));
-    spheres.push_back(Triangle(C, B, D, Vec3(-0.919400, 0.253500, 0.300600), mat));
-    spheres.push_back(Triangle(A, B, C, Vec3(-0.045300, -0.121900, -0.991500), mat));
-    spheres.push_back(Triangle(D, B, A, Vec3(0.192400, -0.899800, 0.391600), mat));
-    spheres.push_back(Triangle(A, C, D, Vec3(0.683700, 0.680000, 0.265000), mat));
+        for (const auto &tri: pyramid_tris) {
+            spheres.push_back(tri);
+        }
+    }
 
-    lightSources.push_back(PointLight(Vec3(2, 3, 6), Color(255, 255, 255)));
+
+    const auto &pyramid_tris =
+            geo_loaders::LoadObj("../geometry_samples/outer_box.obj", Vec3(2, 0, 5), mats[0]);
+
+    for (const auto &tri: pyramid_tris) {
+        spheres.push_back(tri);
+    }
 }
 
 
@@ -145,6 +150,8 @@ int main(int argc, char *argv[]) {
         SDL_RenderPresent(renderer);
     }
     SDL_RenderPresent(renderer);
+
+    std::cout << "Rendered" << std::endl;
 
     SDL_Event event;
     while (SDL_WaitEvent(&event) >= 0) {

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Color.h"
-#include "Vec3.h"
+#include "Color.hpp"
+#include "Vec3.hpp"
 
 class PointLight {
 public:
@@ -14,5 +14,4 @@ public:
         this->position = p;
         this->color = c;
     }
-
 };
