@@ -1,9 +1,4 @@
-//
-// Created by andresokol on 29.01.2018.
-//
-
-#ifndef STUPID_RENDER_SPHERE_H
-#define STUPID_RENDER_SPHERE_H
+#pragma once
 
 #include "../Vec3.h"
 #include "../Material.h"
@@ -16,6 +11,7 @@ public:
     double radius = 0;
 
     Sphere() {};
+
     Sphere(const Vec3 &center, const double &radius, const Material &mat) {
         this->center = center;
         this->radius = radius;
@@ -53,6 +49,3 @@ public:
     }
 
 };
-
-
-#endif //STUPID_RENDER_SPHERE_H

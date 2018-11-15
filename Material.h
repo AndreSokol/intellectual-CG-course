@@ -1,5 +1,4 @@
-#ifndef STUPID_RENDER_MATERIAL_H
-#define STUPID_RENDER_MATERIAL_H
+#pragma once
 
 #include "Color.h"
 
@@ -10,12 +9,10 @@ public:
     double reflective = 0;
 
     Material() {};
+
     Material(Color diffuseColor, double specular, double reflective) {
         this->diffuseColor = diffuseColor;
         this->specular = specular;
         this->reflective = reflective;
     };
 };
-
-
-#endif //STUPID_RENDER_MATERIAL_H

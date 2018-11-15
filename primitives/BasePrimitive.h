@@ -1,5 +1,4 @@
-#ifndef STUPID_RENDER_BASEPRIMITIVE_H
-#define STUPID_RENDER_BASEPRIMITIVE_H
+#pragma once
 
 #include "../Color.h"
 #include "../Material.h"
@@ -10,6 +9,7 @@ public:
     Material mat;
 
     BasePrimitive() {};
+
     BasePrimitive(const Material &mat) {
         this->mat = mat;
     }
@@ -22,6 +22,3 @@ public:
         return false;
     }
 };
-
-
-#endif //STUPID_RENDER_BASEPRIMITIVE_H

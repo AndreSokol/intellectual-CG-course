@@ -13,9 +13,9 @@
 #include <iostream>
 
 int WIDTH = 1366,
-    HEIGHT = 740,
-    D = 1,
-    REFLECT_DEPTH_LIMIT = 2;
+        HEIGHT = 740,
+        D = 1,
+        REFLECT_DEPTH_LIMIT = 2;
 
 Color BACKGROUND_COLOR = Color(0, 0, 0);//Color(29, 33, 36);
 Color AMBIENT = Color(0, 5, 10);
@@ -50,7 +50,7 @@ bool findIntersection(const Vec3 &O, const Vec3 &R,
     bool is_intersected;
     closest_t = CLIPPING_DIST;
 
-    for(size_t i = 0; i < spheres.size(); i += 1) {
+    for (size_t i = 0; i < spheres.size(); i += 1) {
         is_intersected = spheres[i].intersect(O, R, t);
 
         if (!is_intersected) continue;
@@ -121,8 +121,7 @@ void loadGeometry() {
 }
 
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     SDL_Init(SDL_INIT_VIDEO);
     SDL_Window *window = SDL_CreateWindow("Stupid Renderer", 0, 0, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);

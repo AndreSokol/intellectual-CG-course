@@ -1,5 +1,4 @@
-#ifndef STUPID_RENDER_TRIANGLE_H
-#define STUPID_RENDER_TRIANGLE_H
+#pragma once
 
 #include "../Vec3.h"
 #include "../Material.h"
@@ -15,6 +14,7 @@ public:
     Vec3 N = Vec3(1, 0, 0);
 
     Triangle() {};
+
     Triangle(const Vec3 &A, const Vec3 &B, const Vec3 &C, const Vec3 &N, const Material &mat) {
         this->A = A;
         this->B = B;
@@ -42,7 +42,7 @@ public:
         double beta = matrixDet(P, -S, -R) / det;
         double gamma = matrixDet(P, Q, -S) / det;
 
-        if (alpha < - FLOAT_PRECISION || beta < - FLOAT_PRECISION || alpha + beta > 1 + FLOAT_PRECISION) {
+        if (alpha < -FLOAT_PRECISION || beta < -FLOAT_PRECISION || alpha + beta > 1 + FLOAT_PRECISION) {
             return false;
         }
 
@@ -52,9 +52,6 @@ public:
 
     double matrixDet(const Vec3 &I, const Vec3 &J, const Vec3 &K) {
         return I.x * J.y * K.z + J.x * K.y * I.z + K.x * I.y * J.z - (
-               I.x * K.y * J.z + J.x * I.y * K.z + K.x * J.y * I.z);
+                I.x * K.y * J.z + J.x * I.y * K.z + K.x * J.y * I.z);
     }
 };
-
-
-#endif //STUPID_RENDER_TRIANGLE_H
