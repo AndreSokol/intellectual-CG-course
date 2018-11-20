@@ -1,4 +1,8 @@
 #pragma once
 
-#define CLIPPING_DIST 10000.0
-#define FLOAT_PRECISION 1e-6
+constexpr long double CLIPPING_DIST = 10000.0;
+constexpr long double FLOAT_PRECISION = 1e-6;
+
+const int BLOCK_SIZE = 32;
+
+const bool SSAA_ENABLED = false;

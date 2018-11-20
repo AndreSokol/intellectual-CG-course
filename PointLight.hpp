@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Color.hpp"
-#include "Vec3.hpp"
+#include "utils/Color.hpp"
+#include "utils/vec3.hpp"
 
 class PointLight {
 public:

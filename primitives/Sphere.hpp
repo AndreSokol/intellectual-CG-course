@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Vec3.hpp"
+#include "../utils/vec3.hpp"
 #include "../Material.hpp"
 #include "../gl_const.hpp"
 #include "BasePrimitive.hpp"
