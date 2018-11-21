@@ -54,7 +54,7 @@ namespace geo_loaders {
                         std::stod(data[3])
                 );
 
-//                std::cout << "v: vertices read " << vertices.size() << std::endl;
+                std::cout << "v: vertices read " << vertices.size() << std::endl;
             } else if (data[0] == "vn") {
                 normals.emplace_back(
                         std::stod(data[1]),
@@ -62,7 +62,7 @@ namespace geo_loaders {
                         std::stod(data[3])
                 );
 
-//                std::cout << "vn: normals read " << normals.size() << std::endl;
+                std::cout << "vn: normals read " << normals.size() << std::endl;
             } else if (data[0] == "f") {
                 int a = getFaceIndexes(data[1]);
                 int b = getFaceIndexes(data[2]);
@@ -77,7 +77,7 @@ namespace geo_loaders {
                         normals[n],
                         mat
                 );
-//                std::cout << "f: tris read " << tris.size() << std::endl;
+                std::cout << "f: tris read " << tris.size() << std::endl;
             } else {
 //                std::cout << "[skip]: " << line << std::endl;
             }

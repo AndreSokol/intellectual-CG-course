@@ -17,9 +17,10 @@
 #include <thread>
 #include <mutex>
 #include <algorithm>
+#include <fstream>
 
-int WIDTH = 1024;
-int HEIGHT = 768;
+int WIDTH = 480;
+int HEIGHT = 320;
 int BIGGEST_WINDOW_SIZE = std::max(WIDTH, HEIGHT);
 int D = 1;
 int REFLECT_DEPTH_LIMIT = 2;
@@ -75,9 +76,7 @@ Color calculateLighting(const Vec3 &P, const Vec3 &V, Triangle sph) {
     bool is_in_shadow = findIntersection(P, R, t, sph_id);
     if (!is_in_shadow) {
         Material mat = sph.mat;
-        I = AMBIENT;
-        I += mat.diffuseColor * pcos(N, R);
-        I += Color(255, 255, 255) * pow(pcos(R, V), mat.specular);
+        I += mat.diffuseColor * (pcos(N, R) / R.length() / R.length() * 100);
     }
 
     return I;
@@ -97,29 +96,28 @@ Color traceRay(const Vec3 &O, const Vec3 &R) {
 
 
 void loadGeometry() {
-    std::vector<Material> mats{Material(Color(242, 76, 39), 10),
-                               Material(Color(242, 76, 39), 1000),
-                               Material(Color(242, 76, 39), 0.1)};
+    std::vector<Material> mats{Material(Color(242, 76, 39), 0.1),
+                               Material(Color(76, 242, 39), 1000),
+                               Material(Color(100, 100, 10), 0.1),
+                               Material(Color(10, 100, 242), 0.1)};
     std::vector<Vec3> positions{Vec3(-2, 0, 8), Vec3(0, 0, 8), Vec3(2, 0, 8)};
 
-    lightSources.emplace_back(Vec3(2, 3, 6), Color(255, 255, 255));
-    lightSources.emplace_back(Vec3(2, 4, 6), Color(255, 255, 255));
+    lightSources.emplace_back(Vec3(0, 10, 10), Color(255, 255, 255));
 
-    for (auto t: {0, 1, 2}) {
+    std::ifstream input("../geometry_samples/scene");
+
+    while (input.peek() != EOF) {
+        double x, y, z;
+        std::string obj_name;
+        int mat_id;
+        input >> x >> y >> z >> obj_name >> mat_id;
+
         const auto &pyramid_tris =
-                geo_loaders::LoadObj("../geometry_samples/wtf.obj", positions[t], mats[t]);
+                geo_loaders::LoadObj("../geometry_samples/" + obj_name, Vec3(x, y, z), mats.at(mat_id));
 
         for (const auto &tri: pyramid_tris) {
             spheres.push_back(tri);
         }
-    }
-
-
-    const auto &pyramid_tris =
-            geo_loaders::LoadObj("../geometry_samples/outer_box.obj", Vec3(2, 0, 5), mats[0]);
-
-    for (const auto &tri: pyramid_tris) {
-        spheres.push_back(tri);
     }
 }
 
@@ -152,23 +150,19 @@ void renderPixel(render_queue::Queue &rqueue, SDL_Renderer *renderer, const Vec3
 
                 draw_mutex.lock();
                 SDL_SetRenderDrawColor(renderer, c.r(), c.g(), c.b(), SDL_ALPHA_OPAQUE);
-                SDL_RenderDrawPoint(renderer, i, j);
+                SDL_RenderDrawPoint(renderer, 2 * i, 2 * j);
+                SDL_RenderDrawPoint(renderer, 2 * i + 1, 2 * j);
+                SDL_RenderDrawPoint(renderer, 2 * i, 2 * j + 1);
+                SDL_RenderDrawPoint(renderer, 2 * i + 1, 2 * j + 1);
                 draw_mutex.unlock();
             }
         }
-
-        if (!tid) {
-            std::cout << total_tasks - rqueue.size() << "/" << total_tasks << std::endl;
-            draw_mutex.lock();
-            SDL_RenderPresent(renderer);
-            draw_mutex.unlock();
-        };
     }
 }
 
 int main(int argc, char *argv[]) {
     SDL_Init(SDL_INIT_VIDEO);
-    SDL_Window *window = SDL_CreateWindow("Stupid Renderer", 100, 100, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
+    SDL_Window *window = SDL_CreateWindow("Stupid Renderer", 100, 100, WIDTH * 2, HEIGHT * 2, SDL_WINDOW_SHOWN);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
     SDL_RenderClear(renderer);
 
@@ -181,28 +175,36 @@ int main(int argc, char *argv[]) {
     const auto nproc = std::thread::hardware_concurrency() * 2;
     std::cout << "CPU units found: " << nproc << std::endl;
 
-    render_queue::Queue rqueue(HEIGHT, WIDTH);
+    double dlight = 0.4;
+    while (true) {
+        dlight *= -1;
+        for (int frame = 0; frame < 20; frame++) {
+            lightSources[0].position = Vec3(dlight, 0, 0) + lightSources[0].position;
+            render_queue::Queue rqueue(HEIGHT, WIDTH);
 
-    const auto total_tasks = rqueue.size();
-    std::cout << "Tasks generated: " << total_tasks << std::endl;
+            const auto total_tasks = rqueue.size();
+            std::cout << "Tasks generated: " << total_tasks << std::endl;
 
-    const auto start_render = std::chrono::system_clock::now();
+            const auto start_render = std::chrono::system_clock::now();
+            std::vector<std::thread> threads;
+            threads.reserve(nproc);
+            for (int i = 0; i < nproc; i++) {
+                std::thread t(renderPixel, std::ref(rqueue), renderer, O, i, total_tasks);
+                threads.push_back(std::move(t));
+            }
+            for (auto &t: threads) {
+                t.join();
+            }
+            SDL_RenderPresent(renderer);
+            const auto render_duration = std::chrono::system_clock::now() - start_render;
 
-    std::vector<std::thread> threads;
-    threads.reserve(nproc);
-    for (int i = 0; i < nproc; i++) {
-        std::thread t(renderPixel, std::ref(rqueue), renderer, O, i, total_tasks);
-        threads.push_back(std::move(t));
+            std::cout << "Rendered, time:\n";
+            std::cout << "Load geometry: " << geo_load_duration.count() / 1000000 << "ms\n";
+            std::cout << "Render: " << render_duration.count() / 1000000000.0 << "s\n";
+            std::cout << "FPS: " << 1000000000.0 / render_duration.count() << "\n\n";
+        }
+
     }
-    for (auto &t: threads) {
-        t.join();
-    }
-    SDL_RenderPresent(renderer);
-    const auto render_duration = std::chrono::system_clock::now() - start_render;
-
-    std::cout << "Rendered, time:\n";
-    std::cout << "Load geometry: " << geo_load_duration.count() / 1000000 << "ms\n";
-    std::cout << "Render: " << render_duration.count() / 1000000000.0 << "s\n";
 
     SDL_Event event;
     while (SDL_WaitEvent(&event) >= 0) {
