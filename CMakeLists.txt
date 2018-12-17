@@ -13,6 +13,6 @@ include_directories(${SDL2_INCLUDE_DIRS})
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-add_executable(${PROJECT_NAME} main.cpp utils/vec3.cpp utils/vec3.hpp primitives/Sphere.hpp utils/Color.hpp PointLight.hpp primitives/Triangle.hpp primitives/BasePrimitive.hpp gl_const.hpp Material.hpp utils/geo_loaders.cpp utils/geo_loaders.hpp utils/task_queue.cpp utils/task_queue.hpp)
+add_executable(${PROJECT_NAME} main.cpp utils/vec3.cpp utils/vec3.hpp primitives/Sphere.hpp utils/Color.hpp PointLight.hpp primitives/Triangle.hpp primitives/BasePrimitive.hpp gl_const.hpp Material.hpp utils/geo_loaders.cpp utils/geo_loaders.hpp utils/task_queue.cpp utils/task_queue.hpp utils/bvh.cpp utils/bvh.h utils/bounding_box.cpp utils/bounding_box.h)
 target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} Threads::Threads)

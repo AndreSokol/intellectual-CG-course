@@ -4,6 +4,9 @@
 #include "BasePrimitive.hpp"
 #include "../Material.hpp"
 #include "../gl_const.hpp"
+#include "../utils/bounding_box.h"
+#include <algorithm>
+#include <memory>
 
 class Triangle : public BasePrimitive {
 private:
@@ -13,6 +16,7 @@ public:
     Vec3 B = Vec3(0, 0, 0);
     Vec3 C = Vec3(0, 0, 0);
     Vec3 N = Vec3(1, 0, 0);
+    BBox box;
 
     Triangle() {};
 
@@ -22,11 +26,30 @@ public:
         this->C = C;
         this->N = N;
         this->mat = mat;
+
+        for (const auto &i: {0, 1, 2}) {
+            for (const auto &j: {0, 1, 2}) {
+                box.bbmin[i] = std::min(box.bbmin[i], this->operator[](j)[i]);
+                box.bbmax[i] = std::max(box.bbmax[i], this->operator[](j)[i]);
+            }
+        }
     };
 
     Vec3 normal(const Vec3 &P) {
         return this->N;
     };
+
+    Vec3 &operator[](int i) {
+        if (i == 0) return A;
+        if (i == 1) return B;
+        return C;
+    }
+
+    const Vec3 &operator[](int i) const {
+        if (i == 0) return A;
+        if (i == 1) return B;
+        return C;
+    }
 
     bool intersect(const Vec3 &O, const Vec3 &R, double &t) {
         Vec3 P = this->C - this->A;
@@ -56,3 +79,7 @@ public:
                 I.x * K.y * J.z + J.x * I.y * K.z + K.x * J.y * I.z);
     }
 };
+
+typedef std::shared_ptr<Triangle> TriangleRef;
+
+typedef std::vector<TriangleRef> Tris;

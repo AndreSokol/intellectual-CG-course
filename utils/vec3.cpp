@@ -14,6 +14,8 @@ Vec3 &Vec3::operator*=(const double &a) {
     return *this;
 }
 
+
+
 double Vec3::length() const {
     return sqrt(this->x * this->x + this->y * this->y + this->z * this->z);
 }

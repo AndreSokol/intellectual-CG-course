@@ -32,13 +32,13 @@ namespace geo_loaders {
         }
     }
 
-    std::vector<Triangle> LoadObj(const std::string &filename, const Vec3 &pos, const Material &mat) {
+    std::vector<TriangleRef> LoadObj(const std::string &filename, const Vec3 &pos, const Material &mat) {
         std::ifstream file(filename);
         std::string line;
 
         std::vector<Vec3> vertices;
         std::vector<Vec3> normals;
-        std::vector<Triangle> tris;
+        Tris tris;
 
         std::cout << "### Reading: " << filename << std::endl;
 
@@ -70,12 +70,14 @@ namespace geo_loaders {
 
                 int n = getFaceIndexes(data[1], true);
 
-                tris.emplace_back(
-                        vertices[a] + pos,
-                        vertices[b] + pos,
-                        vertices[c] + pos,
-                        normals[n],
-                        mat
+                tris.push_back(
+                        std::make_shared<Triangle>(
+                                vertices[a] + pos,
+                                vertices[b] + pos,
+                                vertices[c] + pos,
+                                normals[n],
+                                mat
+                        )
                 );
                 std::cout << "f: tris read " << tris.size() << std::endl;
             } else {

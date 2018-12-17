@@ -19,6 +19,8 @@
 #include <algorithm>
 #include <fstream>
 
+#include "utils/bvh.h"
+
 int WIDTH = 480;
 int HEIGHT = 320;
 int BIGGEST_WINDOW_SIZE = std::max(WIDTH, HEIGHT);
@@ -28,7 +30,7 @@ int REFLECT_DEPTH_LIMIT = 2;
 Color BACKGROUND_COLOR = Color(29, 33, 36);
 Color AMBIENT = Color(0, 5, 10);
 
-std::vector<Triangle> spheres;
+Tris triangles;
 std::vector<PointLight> lightSources;
 
 std::mutex draw_mutex;
@@ -50,8 +52,8 @@ bool findIntersection(const Vec3 &O, const Vec3 &R,
     bool is_intersected;
     closest_t = CLIPPING_DIST;
 
-    for (size_t i = 0; i < spheres.size(); i += 1) {
-        is_intersected = spheres[i].intersect(O, R, t);
+    for (size_t i = 0; i < triangles.size(); i += 1) {
+        is_intersected = triangles[i]->intersect(O, R, t);
 
         if (!is_intersected) continue;
 
@@ -65,9 +67,9 @@ bool findIntersection(const Vec3 &O, const Vec3 &R,
 }
 
 
-Color calculateLighting(const Vec3 &P, const Vec3 &V, Triangle sph) {
+Color calculateLighting(const Vec3 &P, const Vec3 &V, TriangleRef sph) {
     Vec3 R = lightSources[0].position - P;
-    Vec3 N = sph.normal(P);
+    Vec3 N = sph->normal(P);
 
     Color I = AMBIENT;
 
@@ -75,7 +77,7 @@ Color calculateLighting(const Vec3 &P, const Vec3 &V, Triangle sph) {
     int sph_id;
     bool is_in_shadow = findIntersection(P, R, t, sph_id);
     if (!is_in_shadow) {
-        Material mat = sph.mat;
+        Material mat = sph->mat;
         I += mat.diffuseColor * (pcos(N, R) / R.length() / R.length() * 100);
     }
 
@@ -90,7 +92,7 @@ Color traceRay(const Vec3 &O, const Vec3 &R) {
     bool is_intersected = findIntersection(O, R, t, sph_id);
     if (!is_intersected) return BACKGROUND_COLOR;
 
-    Color c = calculateLighting(O + t * R, R, spheres[sph_id]);
+    Color c = calculateLighting(O + t * R, R, triangles[sph_id]);
     return c;
 }
 
@@ -116,7 +118,7 @@ void loadGeometry() {
                 geo_loaders::LoadObj("../geometry_samples/" + obj_name, Vec3(x, y, z), mats.at(mat_id));
 
         for (const auto &tri: pyramid_tris) {
-            spheres.push_back(tri);
+            triangles.push_back(tri);
         }
     }
 }
@@ -169,6 +171,8 @@ int main(int argc, char *argv[]) {
     const auto start_geo_load = std::chrono::system_clock::now();
     loadGeometry();
     const auto geo_load_duration = std::chrono::system_clock::now() - start_geo_load;
+
+    auto BVH = buildBVH(triangles);
 
     Vec3 O = Vec3(0, 0, 0);
 

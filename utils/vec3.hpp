@@ -14,6 +14,17 @@ public:
 
     const Vec3 reflectOver(const Vec3 &other) const;
 
+    double &operator[](int i) {
+        if (i == 0) return x;
+        if (i == 1) return y;
+        return z;
+    };
+
+    const double &operator[](int i) const {
+        if (i == 0) return x;
+        if (i == 1) return y;
+        return z;
+    };
 
     friend const Vec3 operator*(const double &a, const Vec3 &v) {
         return Vec3(v.x * a, v.y * a, v.z * a);
