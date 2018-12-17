@@ -2,7 +2,7 @@
 // Created by andresokol on 22.11.18.
 //
 
-#include "bounding_box.h"
+#include "bounding_box.hpp"
 
 
 //void BBox::getBBoxForTriangle(const Triangle &tri) {

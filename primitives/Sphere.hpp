@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../utils/vec3.hpp"
-#include "../Material.hpp"
-#include "../gl_const.hpp"
+#include "../core/Material.hpp"
+#include "../core/gl_const.hpp"
 #include "BasePrimitive.hpp"
 
 class Sphere : public BasePrimitive {

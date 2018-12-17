@@ -1,5 +1,5 @@
 #include "task_queue.hpp"
-#include "../gl_const.hpp"
+#include "../core/gl_const.hpp"
 
 #include <algorithm>
 #include <iostream>

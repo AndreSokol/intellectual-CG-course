@@ -2,12 +2,12 @@
 #include <random>
 #include <vector>
 #include "utils/vec3.hpp"
-#include "primitives/Sphere.hpp"
+//#include "primitives/Sphere.hpp"
 #include "primitives/Triangle.hpp"
-#include "primitives/BasePrimitive.hpp"
+//#include "primitives/BasePrimitive.hpp"
 #include <math.h>
-#include "PointLight.hpp"
-#include "Material.hpp"
+#include "core/PointLight.hpp"
+#include "core/Material.hpp"
 #include "utils/geo_loaders.hpp"
 #include "utils/task_queue.hpp"
 
@@ -19,7 +19,7 @@
 #include <algorithm>
 #include <fstream>
 
-#include "utils/bvh.h"
+#include "utils/bvh.hpp"
 
 int WIDTH = 480;
 int HEIGHT = 320;

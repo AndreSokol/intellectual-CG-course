@@ -1,14 +1,15 @@
 #pragma once
 
 #include "../utils/vec3.hpp"
-#include "BasePrimitive.hpp"
-#include "../Material.hpp"
-#include "../gl_const.hpp"
-#include "../utils/bounding_box.h"
+#include "../core/Material.hpp"
+#include "../core/gl_const.hpp"
+#include "../utils/bounding_box.hpp"
+
 #include <algorithm>
 #include <memory>
+#include <vector>
 
-class Triangle : public BasePrimitive {
+class Triangle {
 private:
 
 public:
@@ -16,9 +17,11 @@ public:
     Vec3 B = Vec3(0, 0, 0);
     Vec3 C = Vec3(0, 0, 0);
     Vec3 N = Vec3(1, 0, 0);
+    Material mat;
     BBox box;
 
-    Triangle() {};
+
+    Triangle() = default;
 
     Triangle(const Vec3 &A, const Vec3 &B, const Vec3 &C, const Vec3 &N, const Material &mat) {
         this->A = A;

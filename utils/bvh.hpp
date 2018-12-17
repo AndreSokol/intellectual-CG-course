@@ -18,9 +18,4 @@ public:
 
 typedef std::shared_ptr<BVHNode> BVHPtr;
 
-BVHPtr buildBVH(const Tris &tris) {
-    BVHPtr root = std::make_shared<BVHNode>();
-    root->build(tris);
-
-    return root;
-}
+BVHPtr buildBVH(const Tris &tris);

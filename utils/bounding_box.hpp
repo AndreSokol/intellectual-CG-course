@@ -1,7 +1,6 @@
 #pragma once
 
 #include "vec3.hpp"
-//#include "../primitives/Triangle.hpp"
 #include <limits>
 
 class BBox {

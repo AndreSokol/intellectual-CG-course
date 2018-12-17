@@ -2,11 +2,11 @@
 // Created by andresokol on 21.11.18.
 //
 
-#include "bvh.h"
+#include "bvh.hpp"
 
 #include <iostream>
 #include <limits>
-#include "bounding_box.h"
+#include "bounding_box.hpp"
 
 struct BoxLessMax {
     BoxLessMax(int axis) : axis(axis) {}
@@ -75,4 +75,12 @@ void BVHNode::build(const Tris &tris) {
     }
     this->right = std::make_shared<BVHNode>();
     this->right->build(children);
+}
+
+
+BVHPtr buildBVH(const Tris &tris) {
+    BVHPtr root = std::make_shared<BVHNode>();
+    root->build(tris);
+
+    return root;
 }
