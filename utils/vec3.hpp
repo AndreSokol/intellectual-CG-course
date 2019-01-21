@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ostream>
 class Vec3 {
  public:
   double x, y, z;
@@ -58,3 +59,5 @@ double dot(const Vec3 &a, const Vec3 &b);
 double cos(const Vec3 &a, const Vec3 &b);
 
 double pcos(const Vec3 &a, const Vec3 &b);
+
+std::ostream &operator<<(std::ostream &os, Vec3 &v);

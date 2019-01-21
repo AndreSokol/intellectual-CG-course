@@ -23,3 +23,5 @@ class BVHNode {
 typedef std::shared_ptr<BVHNode> BVHPtr;
 
 BVHPtr buildBVH(const Tris &tris);
+
+std::ostream &operator<<(std::ostream &os, BVHNode &node);

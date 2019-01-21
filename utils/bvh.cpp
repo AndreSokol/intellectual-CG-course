@@ -1,7 +1,3 @@
-//
-// Created by andresokol on 21.11.18.
-//
-
 #include "bvh.hpp"
 
 #include <iostream>
@@ -36,6 +32,7 @@ void BVHNode::build(const Tris &tris) {
 
   if (TRIS_COUNT <= 2) {
     primitives = tris;
+    std::cout << *this << std::endl;
     return;
   }
 
@@ -75,6 +72,8 @@ void BVHNode::build(const Tris &tris) {
   }
   this->right = std::make_shared<BVHNode>();
   this->right->build(children);
+
+//  std::cout << *this << std::endl;
 }
 
 bool BVHNode::findIntersection(TriangleRef &triangle, double &t, const Vec3 &O, const Vec3 &R) {
@@ -87,22 +86,43 @@ bool BVHNode::findIntersection(TriangleRef &triangle, double &t, const Vec3 &O, 
   }
 
   if (!left) {
+    bool is_intersecting = false;
     for (const auto &prim : primitives) {
       double dt;
-      if (prim->intersect(O, R, dt)) {
-        t = std::min(t, dt);
+      if (prim->intersect(O, R, dt) && dt < t) {
+        t = dt;
+        triangle = prim;
+        is_intersecting = true;
       }
     }
 
-    return t != std::numeric_limits<double>::max();
+    return is_intersecting;
   }
 
   return left->findIntersection(triangle, t, O, R) || right->findIntersection(triangle, t, O, R);
+}
+
+void drawBVH(BVHPtr node, int d) {
+  if (node == nullptr) return;
+
+  drawBVH(node->left, d + 1);
+
+  for (int i = 0; i < d; i++) {
+    std::cout << " ";
+  }
+  std::cout << node->primitives.size() << std::endl;
+
+  drawBVH(node->right, d + 1);
 }
 
 BVHPtr buildBVH(const Tris &tris) {
   BVHPtr root = std::make_shared<BVHNode>();
   root->build(tris);
 
+  drawBVH(root, 0);
   return root;
+}
+
+std::ostream &operator<<(std::ostream &os, BVHNode &node) {
+  return os << "Tris: " << node.primitives.size() << ", bbox: " << node.bbox;
 }

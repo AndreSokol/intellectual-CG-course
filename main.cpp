@@ -85,13 +85,19 @@ Color calculateLighting(const Vec3 &P, const Vec3 &V, TriangleRef sph) {
 }
 
 Color traceRay(const Vec3 &O, const Vec3 &R) {
-  double t = 0;
+  double t = std::numeric_limits<double>::max();
 //  int sph_id;
 
   TriangleRef triangle;
-  bool is_intersected = findIntersection(O, R, t, triangle);
+//  bool is_intersected = findIntersection(O, R, t, triangle);
 
-//  bool is_intersected = BVH->findIntersection(triangle, t, O, R);
+  bool is_intersected = BVH->findIntersection(triangle, t, O, R);
+//  std::cout << (is_intersected == true) << " " << (triangle == nullptr) << std::endl;
+//  if (is_intersected && triangle == nullptr) {
+//    t = std::numeric_limits<double>::max();;
+//    is_intersected = BVH->findIntersection(triangle, t, O, R);
+//  }
+
   if (!is_intersected) return BACKGROUND_COLOR;
 
   Color c = calculateLighting(O + t * R, R, triangle);
@@ -153,7 +159,7 @@ void renderPixel(render_queue::Queue &rqueue, SDL_Renderer *renderer, const Vec3
 
         draw_mutex.lock();
         SDL_SetRenderDrawColor(renderer, c.r(), c.g(), c.b(), SDL_ALPHA_OPAQUE);
-        SDL_RenderDrawPoint(renderer, i, j);
+//        SDL_RenderDrawPoint(renderer, i, j);
         SDL_RenderDrawPoint(renderer, 2 * i, 2 * j);
         SDL_RenderDrawPoint(renderer, 2 * i + 1, 2 * j);
         SDL_RenderDrawPoint(renderer, 2 * i, 2 * j + 1);
@@ -178,7 +184,8 @@ int main(int argc, char *argv[]) {
 
   Vec3 O = Vec3(0, 0, 0);
 
-  const auto nproc = std::thread::hardware_concurrency() * 2;
+//  const auto nproc = std::thread::hardware_concurrency() * 2;
+  int nproc = 1;
   std::cout << "CPU units found: " << nproc << std::endl;
 
   double dlight = 0.4;

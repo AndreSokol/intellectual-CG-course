@@ -34,3 +34,7 @@ double pcos(const Vec3 &a, const Vec3 &b) {
   if (cosValue > 0) return cosValue;
   return 0;
 }
+
+std::ostream &operator<<(std::ostream &os, Vec3 &v) {
+  return os << "(" << v.x << ", " << v.y << ", " << v.z << ")";
+}
