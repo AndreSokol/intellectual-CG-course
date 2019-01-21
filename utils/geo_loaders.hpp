@@ -6,7 +6,6 @@
 #include <string>
 #include <vector>
 
-
 namespace geo_loaders {
-    Tris LoadObj(const std::string &filename, const Vec3 &pos, const Material &mat);
+Tris LoadObj(const std::string &filename, const Vec3 &pos, const Material &mat);
 }

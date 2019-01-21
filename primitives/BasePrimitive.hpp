@@ -5,20 +5,20 @@
 #include <vector>
 
 class BasePrimitive {
-public:
-    Material mat;
+ public:
+  Material mat;
 
-    BasePrimitive() {};
+  BasePrimitive() {};
 
-    BasePrimitive(const Material &mat) {
-        this->mat = mat;
-    }
+  BasePrimitive(const Material &mat) {
+    this->mat = mat;
+  }
 
-    Vec3 normal(const Vec3 &P) {
-        return Vec3(0, 0, 0);
-    };
+  Vec3 normal(const Vec3 &P) {
+    return Vec3(0, 0, 0);
+  };
 
-    bool intersect(const Vec3 &O, const Vec3 &R, double &t) {
-        return false;
-    }
+  bool intersect(const Vec3 &O, const Vec3 &R, double &t) {
+    return false;
+  }
 };

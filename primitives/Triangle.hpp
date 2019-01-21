@@ -84,5 +84,4 @@ public:
 };
 
 typedef std::shared_ptr<Triangle> TriangleRef;
-
 typedef std::vector<TriangleRef> Tris;
