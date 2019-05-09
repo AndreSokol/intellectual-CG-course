@@ -31,7 +31,7 @@ int getFaceIndexes(const std::string &s, bool normal = false) {
 }
 }
 
-std::vector<TriangleRef> LoadObj(const std::string &filename, const Vec3 &pos, const Material &mat) {
+std::vector<TriangleRef> LoadObj(const std::string &filename, const Vec3 &pos, const MatRef &mat) {
   std::ifstream file(filename);
   std::string line;
 

@@ -1,6 +1,6 @@
 #include "Triangle.hpp"
 
-Triangle::Triangle(const Vec3 &A, const Vec3 &B, const Vec3 &C, const Vec3 &N, const Material &mat) {
+Triangle::Triangle(const Vec3 &A, const Vec3 &B, const Vec3 &C, const Vec3 &N, const MatRef &mat) {
   this->A = A;
   this->B = B;
   this->C = C;

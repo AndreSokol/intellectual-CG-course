@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "../utils/Color.hpp"
 
 class Material {
@@ -8,11 +10,10 @@ class Material {
   double specular = 0;
   double reflective = 0;
 
-  Material() {};
+  Material() = default;
 
-  Material(Color diffuseColor, double specular, double reflective = 0.0) {
-    this->diffuseColor = diffuseColor;
-    this->specular = specular;
-    this->reflective = reflective;
-  };
+  Material(Color diffuseColor, double specular, double reflective = 0.0)
+      : diffuseColor(diffuseColor), specular(specular), reflective(reflective) {}
 };
+
+typedef std::shared_ptr<Material> MatRef;

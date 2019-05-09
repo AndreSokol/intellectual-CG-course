@@ -2,9 +2,9 @@
 #include <random>
 #include <vector>
 #include "utils/vec3.hpp"
-//#include "primitives/Sphere.hpp"
+#include "primitives/Sphere.hpp"
 #include "primitives/Triangle.hpp"
-//#include "primitives/BasePrimitive.hpp"
+#include "primitives/BasePrimitive.hpp"
 #include <math.h>
 #include "core/PointLight.hpp"
 #include "core/Material.hpp"
@@ -21,6 +21,7 @@
 
 #include "utils/bvh.hpp"
 
+typedef PrimRef ptr;
 int WIDTH = 480;
 int HEIGHT = 320;
 int BIGGEST_WINDOW_SIZE = std::max(WIDTH, HEIGHT);
@@ -30,12 +31,12 @@ int REFLECT_DEPTH_LIMIT = 2;
 Color BACKGROUND_COLOR = Color(29, 33, 36);
 Color AMBIENT = Color(0, 5, 10);
 
-Tris triangles;
+Color WHITE = Color(255, 255, 255);
+
+Prims triangles;
 std::vector<PointLight> lightSources;
 
 std::mutex draw_mutex;
-
-BVHPtr BVH;
 
 void StoW(const double &Sx, const double &Sy, double &Cx, double &Cy) {
   Cx = Sx;
@@ -43,42 +44,39 @@ void StoW(const double &Sx, const double &Sy, double &Cx, double &Cy) {
 
   Cx = Cx - double(WIDTH) / 2.0;
   Cy = -(Cy - double(HEIGHT) / 2.0);
-
-  return;
 }
 
 bool findIntersection(const Vec3 &O, const Vec3 &R,
-                      double &closest_t, TriangleRef &triangle) {
+                      double &closest_t, PrimRef &intersected_primitive) {
   double t;
   bool is_intersected;
   closest_t = CLIPPING_DIST;
 
-  for (size_t i = 0; i < triangles.size(); i += 1) {
-    is_intersected = triangles[i]->intersect(O, R, t);
+  for (const auto &prim: triangles) {
+    is_intersected = prim->intersect(O, R, t);
 
     if (!is_intersected) continue;
 
     if (t < closest_t && t > FLOAT_PRECISION) {
       closest_t = t;
-      triangle = triangles[i];
+      intersected_primitive = prim;
     }
   }
 
   return closest_t < CLIPPING_DIST - FLOAT_PRECISION;
 }
 
-Color calculateLighting(const Vec3 &P, const Vec3 &V, TriangleRef sph) {
+Color calculateLighting(const Vec3 &P, const Vec3 &V, PrimRef &prim) {
   Vec3 R = lightSources[0].position - P;
-  Vec3 N = sph->normal(P);
+  Vec3 N = prim->normal(P);
 
   Color I = AMBIENT;
 
-  double t;
-  TriangleRef sph_id;
+  double t = std::numeric_limits<double>::max();
+  PrimRef sph_id;
   bool is_in_shadow = findIntersection(P, R, t, sph_id);
-  if (!is_in_shadow) {
-    Material mat = sph->mat;
-    I += mat.diffuseColor * (pcos(N, R) / R.length() / R.length() * 100);
+  if (pcos(N, R) >= 0 && !is_in_shadow) {
+    I += prim->mat->diffuseColor * pcos(N, R);
   }
 
   return I;
@@ -86,21 +84,13 @@ Color calculateLighting(const Vec3 &P, const Vec3 &V, TriangleRef sph) {
 
 Color traceRay(const Vec3 &O, const Vec3 &R) {
   double t = std::numeric_limits<double>::max();
-//  int sph_id;
 
-  TriangleRef triangle;
-//  bool is_intersected = findIntersection(O, R, t, triangle);
-
-  bool is_intersected = BVH->findIntersection(triangle, t, O, R);
-//  std::cout << (is_intersected == true) << " " << (triangle == nullptr) << std::endl;
-//  if (is_intersected && triangle == nullptr) {
-//    t = std::numeric_limits<double>::max();;
-//    is_intersected = BVH->findIntersection(triangle, t, O, R);
-//  }
+  PrimRef prim;
+  bool is_intersected = findIntersection(O, R, t, prim);
 
   if (!is_intersected) return BACKGROUND_COLOR;
 
-  Color c = calculateLighting(O + t * R, R, triangle);
+  Color c = calculateLighting(O + t * R, R, prim);
   return c;
 }
 
@@ -111,7 +101,10 @@ void loadGeometry() {
                              Material(Color(10, 100, 242), 0.1)};
   std::vector<Vec3> positions{Vec3(-2, 0, 8), Vec3(0, 0, 8), Vec3(2, 0, 8)};
 
-  lightSources.emplace_back(Vec3(0, 10, 10), Color(255, 255, 255));
+  lightSources.emplace_back(Vec3(-2, 10, 10), Color(255, 255, 255));
+  triangles.push_back(
+      std::make_shared<Sphere>(Vec3(1, -1, 10), 1.0, std::make_shared<Material>(mats[0]))
+  );
 
   std::ifstream input("../geometry_samples/scene");
 
@@ -122,12 +115,15 @@ void loadGeometry() {
     input >> x >> y >> z >> obj_name >> mat_id;
 
     const auto &pyramid_tris =
-        geo_loaders::LoadObj("../geometry_samples/" + obj_name, Vec3(x, y, z), mats.at(mat_id));
+        geo_loaders::LoadObj("../geometry_samples/" + obj_name,
+                             Vec3(x, y, z),
+                             std::make_shared<Material>(mats.at(mat_id)));
 
     for (const auto &tri: pyramid_tris) {
       triangles.push_back(tri);
     }
   }
+
 }
 
 void renderPixel(render_queue::Queue &rqueue, SDL_Renderer *renderer, const Vec3 &O, int tid, int total_tasks) {
@@ -180,51 +176,41 @@ int main(int argc, char *argv[]) {
   loadGeometry();
   const auto geo_load_duration = std::chrono::system_clock::now() - start_geo_load;
 
-  BVH = buildBVH(triangles);
-
   Vec3 O = Vec3(0, 0, 0);
 
-//  const auto nproc = std::thread::hardware_concurrency() * 2;
+  // const auto nproc = std::thread::hardware_concurrency() * 2;
   int nproc = 1;
   std::cout << "CPU units found: " << nproc << std::endl;
 
-  double dlight = 0.4;
-//    while (true) {
-  dlight *= -1;
-  for (int frame = 0; frame < 20; frame++) {
-    lightSources[0].position = Vec3(dlight, 0, 0) + lightSources[0].position;
-    render_queue::Queue rqueue(HEIGHT, WIDTH);
+  render_queue::Queue rqueue(HEIGHT, WIDTH);
 
-    const auto total_tasks = rqueue.size();
-    std::cout << "Tasks generated: " << total_tasks << std::endl;
+  const auto total_tasks = rqueue.size();
+  std::cout << "Tasks generated: " << total_tasks << std::endl;
 
-    const auto start_render = std::chrono::system_clock::now();
-    std::vector<std::thread> threads;
-    threads.reserve(nproc);
-    for (int i = 0; i < nproc; i++) {
-      std::thread t(renderPixel, std::ref(rqueue), renderer, O, i, total_tasks);
-      threads.push_back(std::move(t));
-    }
-    for (auto &t: threads) {
-      t.join();
-    }
-    SDL_RenderPresent(renderer);
-    const auto render_duration = std::chrono::system_clock::now() - start_render;
-
-    std::cout << "Rendered, time:\n";
-    std::cout << "Load geometry: " << geo_load_duration.count() / 1000000 << "ms\n";
-    std::cout << "Render: " << render_duration.count() / 1000000000.0 << "s\n";
-    std::cout << "FPS: " << 1000000000.0 / render_duration.count() << "\n\n";
+  const auto start_render = std::chrono::system_clock::now();
+  std::vector<std::thread> threads;
+  threads.reserve(nproc);
+  for (int i = 0; i < nproc; i++) {
+    std::thread t(renderPixel, std::ref(rqueue), renderer, O, i, total_tasks);
+    threads.push_back(std::move(t));
   }
+  for (auto &t: threads) {
+    t.join();
+  }
+  SDL_RenderPresent(renderer);
+  const auto render_duration = std::chrono::system_clock::now() - start_render;
 
-//    }
+  std::cout << "Rendered, time:\n";
+  std::cout << "Load geometry: " << geo_load_duration.count() / 1000000 << "ms\n";
+  std::cout << "Render: " << render_duration.count() / 1000000000.0 << "s\n";
+  std::cout << "FPS: " << 1000000000.0 / render_duration.count() << "\n\n";
 
-//    SDL_Event event;
-//    while (SDL_WaitEvent(&event) >= 0) {
-//        if (event.type == SDL_QUIT) {
-//            break;
-//        }
-//    }
+  SDL_Event event;
+  while (SDL_WaitEvent(&event) >= 0) {
+    if (event.type == SDL_QUIT) {
+      break;
+    }
+  }
 
   SDL_DestroyWindow(window);
   SDL_Quit();

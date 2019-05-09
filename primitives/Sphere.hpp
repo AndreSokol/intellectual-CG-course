@@ -4,25 +4,26 @@
 #include "../core/Material.hpp"
 #include "../core/gl_const.hpp"
 #include "BasePrimitive.hpp"
+#include <math.h>
 
 class Sphere : public BasePrimitive {
  public:
   Vec3 center = Vec3(0, 0, 0);
   double radius = 0;
 
-  Sphere() {};
+  Sphere() = default;
 
-  Sphere(const Vec3 &center, const double &radius, const Material &mat) {
+  Sphere(const Vec3 &center, const double &radius, const MatRef &mat) {
     this->center = center;
     this->radius = radius;
     this->mat = mat;
   };
 
-  Vec3 normal(const Vec3 &P) {
+  Vec3 normal(const Vec3 &P) override {
     return normalize(P - this->center);
   };
 
-  bool intersect(const Vec3 &O, const Vec3 &R, double &t) {
+  bool intersect(const Vec3 &O, const Vec3 &R, double &t) override {
     Vec3 C = O - this->center;
 
     double k1 = dot(R, R),
