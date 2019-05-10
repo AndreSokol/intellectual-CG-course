@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "../utils/Color.hpp"
+#include "../utils/color.hpp"
 
 class Material {
 public:

@@ -1,4 +1,4 @@
-#include "Triangle.hpp"
+#include "triangle.hpp"
 
 Triangle::Triangle(const Vec3 &A, const Vec3 &B, const Vec3 &C, const Vec3 &N,
                    const MatRef &mat) {

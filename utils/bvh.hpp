@@ -3,7 +3,7 @@
 #include <memory>
 #include <vector>
 
-#include "../primitives/Triangle.hpp"
+#include "../primitives/triangle.hpp"
 
 class BVHNode {
 public:

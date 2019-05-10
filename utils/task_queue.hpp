@@ -13,14 +13,14 @@ struct Task {
 
 class Queue {
 public:
-  Queue(int height, int width);
+  Queue(int height, int width, int block_size);
 
   bool pop(Task &);
 
   unsigned long size();
 
 private:
-  void fill(int height, int width);
+  void fill(int height, int width, int block_size);
 
   std::queue<Task> _data;
   std::mutex _mutex;

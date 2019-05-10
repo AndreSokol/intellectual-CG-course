@@ -1,11 +1,11 @@
 #pragma once
 
-#include "BasePrimitive.hpp"
+#include "base_primitive.hpp"
 
 #include <math.h>
 
-#include "../core/Material.hpp"
 #include "../core/gl_const.hpp"
+#include "../core/material.hpp"
 #include "../utils/vec3.hpp"
 
 class Sphere : public BasePrimitive {

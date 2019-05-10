@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../utils/Color.hpp"
+#include "../utils/color.hpp"
 #include "../utils/vec3.hpp"
 
 class PointLight {

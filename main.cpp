@@ -11,26 +11,20 @@
 #include <thread>
 #include <vector>
 
-#include "core/Material.hpp"
-#include "core/PointLight.hpp"
-#include "primitives/BasePrimitive.hpp"
-#include "primitives/Sphere.hpp"
-#include "primitives/Triangle.hpp"
+#include "core/material.hpp"
+#include "core/point_light.hpp"
+#include "primitives/base_primitive.hpp"
+#include "primitives/sphere.hpp"
+#include "primitives/triangle.hpp"
+#include "settings.hpp"
 #include "utils/bvh.hpp"
 #include "utils/geo_loaders.hpp"
 #include "utils/task_queue.hpp"
 #include "utils/vec3.hpp"
 
 typedef PrimRef ptr;
-int WIDTH = 480;
-int HEIGHT = 320;
-int BIGGEST_WINDOW_SIZE = std::max(WIDTH, HEIGHT);
-int D = 1;
-int REFLECT_DEPTH_LIMIT = 2;
 
-Color BACKGROUND_COLOR = Color(29, 33, 36);
-Color AMBIENT = Color(0, 5, 10);
-
+Settings settings;
 Prims triangles;
 std::vector<PointLight> lightSources;
 
@@ -40,8 +34,8 @@ void StoW(const double &Sx, const double &Sy, double &Cx, double &Cy) {
   Cx = Sx;
   Cy = Sy;
 
-  Cx = Cx - double(WIDTH) / 2.0;
-  Cy = -(Cy - double(HEIGHT) / 2.0);
+  Cx = Cx - double(settings.WIDTH) / 2.0;
+  Cy = -(Cy - double(settings.HEIGHT) / 2.0);
 }
 
 bool findIntersection(const Vec3 &O, const Vec3 &R, double &closest_t,
@@ -69,7 +63,7 @@ Color calculateLighting(const Vec3 &P, const Vec3 &V, PrimRef &prim) {
   Vec3 R = lightSources[0].position - P;
   Vec3 N = prim->normal(P);
 
-  Color I = AMBIENT;
+  Color I = settings.AMBIENT;
 
   double t = std::numeric_limits<double>::max();
   PrimRef sph_id;
@@ -88,7 +82,7 @@ Color traceRay(const Vec3 &O, const Vec3 &R) {
   bool is_intersected = findIntersection(O, R, t, prim);
 
   if (!is_intersected)
-    return BACKGROUND_COLOR;
+    return settings.BACKGROUND_COLOR;
 
   Color c = calculateLighting(O + t * R, R, prim);
   return c;
@@ -131,33 +125,43 @@ void renderPixel(render_queue::Queue &rqueue, SDL_Renderer *renderer,
       for (int j = task.s_y; j < task.f_y; j++) {
         double Cx, Cy;
         StoW(i, j, Cx, Cy);
-        Vec3 R =
-            Vec3(Cx / BIGGEST_WINDOW_SIZE, Cy / BIGGEST_WINDOW_SIZE, 1) * D;
+        Vec3 R = Vec3(Cx / settings.BIGGEST_WINDOW_SIZE,
+                      Cy / settings.BIGGEST_WINDOW_SIZE, 1) *
+                 settings.D;
         Color c = traceRay(O, normalize(R));
 
-        if (SSAA_ENABLED) {
+        if (settings.SSAA_ENABLED) {
           c = c * 0.25;
 
           StoW(i + 0.5, j + 0.5, Cx, Cy);
-          R = Vec3(Cx / BIGGEST_WINDOW_SIZE, Cy / BIGGEST_WINDOW_SIZE, 1) * D;
+          R = Vec3(Cx / settings.BIGGEST_WINDOW_SIZE,
+                   Cy / settings.BIGGEST_WINDOW_SIZE, 1) *
+              settings.D;
           c += 0.25 * traceRay(O, normalize(R));
 
           StoW(i, j + 0.5, Cx, Cy);
-          R = Vec3(Cx / BIGGEST_WINDOW_SIZE, Cy / BIGGEST_WINDOW_SIZE, 1) * D;
+          R = Vec3(Cx / settings.BIGGEST_WINDOW_SIZE,
+                   Cy / settings.BIGGEST_WINDOW_SIZE, 1) *
+              settings.D;
           c += 0.25 * traceRay(O, normalize(R));
 
           StoW(i + 0.5, j, Cx, Cy);
-          R = Vec3(Cx / BIGGEST_WINDOW_SIZE, Cy / BIGGEST_WINDOW_SIZE, 1) * D;
+          R = Vec3(Cx / settings.BIGGEST_WINDOW_SIZE,
+                   Cy / settings.BIGGEST_WINDOW_SIZE, 1) *
+              settings.D;
           c += 0.25 * traceRay(O, normalize(R));
         }
 
         draw_mutex.lock();
         SDL_SetRenderDrawColor(renderer, c.r(), c.g(), c.b(), SDL_ALPHA_OPAQUE);
-        //        SDL_RenderDrawPoint(renderer, i, j);
-        SDL_RenderDrawPoint(renderer, 2 * i, 2 * j);
-        SDL_RenderDrawPoint(renderer, 2 * i + 1, 2 * j);
-        SDL_RenderDrawPoint(renderer, 2 * i, 2 * j + 1);
-        SDL_RenderDrawPoint(renderer, 2 * i + 1, 2 * j + 1);
+        if (settings.SCALING_ENABLED) {
+          SDL_RenderDrawPoint(renderer, 2 * i, 2 * j);
+          SDL_RenderDrawPoint(renderer, 2 * i + 1, 2 * j);
+          SDL_RenderDrawPoint(renderer, 2 * i, 2 * j + 1);
+          SDL_RenderDrawPoint(renderer, 2 * i + 1, 2 * j + 1);
+        } else {
+          SDL_RenderDrawPoint(renderer, i, j);
+        }
         draw_mutex.unlock();
       }
     }
@@ -165,9 +169,12 @@ void renderPixel(render_queue::Queue &rqueue, SDL_Renderer *renderer,
 }
 
 int main(int argc, char *argv[]) {
+  settings.init_from_args(argc, argv);
+
   SDL_Init(SDL_INIT_VIDEO);
-  SDL_Window *window = SDL_CreateWindow("Stupid Renderer", 100, 100, WIDTH * 2,
-                                        HEIGHT * 2, SDL_WINDOW_SHOWN);
+  SDL_Window *window =
+      SDL_CreateWindow("Stupid Renderer", 100, 100, settings.WIDTH * 2,
+                       settings.HEIGHT * 2, SDL_WINDOW_SHOWN);
   SDL_Renderer *renderer =
       SDL_CreateRenderer(window, -1, SDL_RENDERER_SOFTWARE);
   SDL_RenderClear(renderer);
@@ -179,12 +186,13 @@ int main(int argc, char *argv[]) {
 
   Vec3 O = Vec3(0, 0, 0);
 
-  //  const auto nproc = std::thread::hardware_concurrency() * 2;
-  int nproc = 1;
+  const auto nproc = std::thread::hardware_concurrency() * 2;
+  // int nproc = 1;
   std::cout << "CPU units found: " << nproc << std::endl;
 
   for (auto x : {0, 1, 2, 3, 4, 5, 6, 7, 8, 9}) {
-    render_queue::Queue rqueue(HEIGHT, WIDTH);
+    render_queue::Queue rqueue(settings.HEIGHT, settings.WIDTH,
+                               settings.BLOCK_SIZE);
 
     const auto total_tasks = rqueue.size();
     std::cout << "Tasks generated: " << total_tasks << std::endl;
