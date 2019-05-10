@@ -1,12 +1,12 @@
 #pragma once
 
+#include <memory>
+#include <vector>
+
 #include "../primitives/Triangle.hpp"
 
-#include <vector>
-#include <memory>
-
 class BVHNode {
- public:
+public:
   std::shared_ptr<BVHNode> left;
   std::shared_ptr<BVHNode> right;
   BBox bbox;
@@ -17,7 +17,8 @@ class BVHNode {
 
   void updateBbox(const Tris &tris);
 
-  bool findIntersection(TriangleRef &triangle, double &t, const Vec3 &O, const Vec3 &R);
+  bool findIntersection(TriangleRef &triangle, double &t, const Vec3 &O,
+                        const Vec3 &R);
 };
 
 typedef std::shared_ptr<BVHNode> BVHPtr;

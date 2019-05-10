@@ -7,8 +7,7 @@ double BBox::volume() {
 }
 
 BBox::IntersectionData BBox::isIntersecting(const Vec3 &O, const Vec3 &R) {
-  IntersectionData res{false,
-                       std::numeric_limits<double>::min(),
+  IntersectionData res{false, std::numeric_limits<double>::min(),
                        std::numeric_limits<double>::max()};
 
   for (int axis : {0, 1, 2}) {
@@ -35,5 +34,6 @@ BBox::IntersectionData BBox::isIntersecting(const Vec3 &O, const Vec3 &R) {
 }
 
 std::ostream &operator<<(std::ostream &os, BBox &bbox) {
-  return os << bbox.bbmin << " <-> " << bbox.bbmax << ", volume=" << bbox.volume();
+  return os << bbox.bbmin << " <-> " << bbox.bbmax
+            << ", volume=" << bbox.volume();
 }

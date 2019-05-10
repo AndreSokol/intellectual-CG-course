@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <limits>
+
 #include "bounding_box.hpp"
 
 struct BoxLessMax {
@@ -15,11 +16,13 @@ struct BoxLessMax {
 };
 
 void BVHNode::updateBbox(const Tris &tris) {
-  for (int axis: {0, 1, 2}) {
-    for (const auto &tri: tris) {
-      for (int vertex: {0, 1, 2}) {
-        bbox.bbmin[axis] = std::min(bbox.bbmin[axis], tri->operator[](vertex)[axis]);
-        bbox.bbmax[axis] = std::max(bbox.bbmax[axis], tri->operator[](vertex)[axis]);
+  for (int axis : {0, 1, 2}) {
+    for (const auto &tri : tris) {
+      for (int vertex : {0, 1, 2}) {
+        bbox.bbmin[axis] =
+            std::min(bbox.bbmin[axis], tri->operator[](vertex)[axis]);
+        bbox.bbmax[axis] =
+            std::max(bbox.bbmax[axis], tri->operator[](vertex)[axis]);
       }
     }
   }
@@ -44,11 +47,12 @@ void BVHNode::build(const Tris &tris) {
 
   int min_axis = 0, min_i = 0;
   double min_sah = std::numeric_limits<double>::max();
-  for (int axis: {0, 1, 2}) {
+  for (int axis : {0, 1, 2}) {
     double min_coord = sortedTris[axis][0]->box.bbmin[axis];
     double max_coord = sortedTris[axis][TRIS_COUNT - 1]->box.bbmax[axis];
     for (int i = 0; i + 1 < TRIS_COUNT; i++) {
-      double current_sah = (sortedTris[axis][i]->box.bbmax[axis] - min_coord) * i +
+      double current_sah =
+          (sortedTris[axis][i]->box.bbmax[axis] - min_coord) * i +
           (max_coord - sortedTris[axis][i]->box.bbmax[axis]) * (TRIS_COUNT - i);
 
       if (current_sah < min_sah) {
@@ -73,14 +77,14 @@ void BVHNode::build(const Tris &tris) {
   this->right = std::make_shared<BVHNode>();
   this->right->build(children);
 
-//  std::cout << *this << std::endl;
+  //  std::cout << *this << std::endl;
 }
 
-bool BVHNode::findIntersection(TriangleRef &triangle, double &t, const Vec3 &O, const Vec3 &R) {
+bool BVHNode::findIntersection(TriangleRef &triangle, double &t, const Vec3 &O,
+                               const Vec3 &R) {
   const auto &bbox_intersection = bbox.isIntersecting(O, R);
 
-  if (!bbox_intersection.is_intersecting ||
-      t < bbox_intersection.tmin ||
+  if (!bbox_intersection.is_intersecting || t < bbox_intersection.tmin ||
       bbox_intersection.tmax < 0) {
     return false;
   }
@@ -99,11 +103,13 @@ bool BVHNode::findIntersection(TriangleRef &triangle, double &t, const Vec3 &O, 
     return is_intersecting;
   }
 
-  return left->findIntersection(triangle, t, O, R) || right->findIntersection(triangle, t, O, R);
+  return left->findIntersection(triangle, t, O, R) ||
+         right->findIntersection(triangle, t, O, R);
 }
 
 void drawBVH(BVHPtr node, int d) {
-  if (node == nullptr) return;
+  if (node == nullptr)
+    return;
 
   drawBVH(node->left, d + 1);
 

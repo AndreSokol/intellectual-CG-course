@@ -4,7 +4,7 @@
 #include "../utils/vec3.hpp"
 
 class PointLight {
- public:
+public:
   Color color;
   Vec3 position;
 

@@ -1,11 +1,12 @@
 #pragma once
 
 #include <ostream>
+
 class Vec3 {
- public:
+public:
   double x, y, z;
 
-  Vec3() {};
+  Vec3(){};
 
   Vec3(double x, double y, double z) {
     this->x = x;
@@ -16,14 +17,18 @@ class Vec3 {
   const Vec3 reflectOver(const Vec3 &other) const;
 
   double &operator[](int i) {
-    if (i == 0) return x;
-    if (i == 1) return y;
+    if (i == 0)
+      return x;
+    if (i == 1)
+      return y;
     return z;
   };
 
   const double &operator[](int i) const {
-    if (i == 0) return x;
-    if (i == 1) return y;
+    if (i == 0)
+      return x;
+    if (i == 1)
+      return y;
     return z;
   };
 
@@ -39,15 +44,11 @@ class Vec3 {
     return a + (-1 * b);
   }
 
-  const Vec3 operator*(const double &a) {
-    return a * *this;
-  }
+  const Vec3 operator*(const double &a) { return a * *this; }
 
   Vec3 &operator*=(const double &a);
 
-  Vec3 operator-() const {
-    return -1 * *this;
-  };
+  Vec3 operator-() const { return -1 * *this; };
 
   double length() const;
 };

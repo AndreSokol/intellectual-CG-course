@@ -1,19 +1,18 @@
 #pragma once
 
-#include "./BasePrimitive.hpp"
-#include "../utils/vec3.hpp"
 #include "../core/Material.hpp"
 #include "../core/gl_const.hpp"
 #include "../utils/bounding_box.hpp"
+#include "../utils/vec3.hpp"
+#include "./BasePrimitive.hpp"
 
 #include <algorithm>
 #include <memory>
 #include <vector>
 
 class Triangle : public BasePrimitive {
- private:
-
- public:
+private:
+public:
   Vec3 A = Vec3(0, 0, 0);
   Vec3 B = Vec3(0, 0, 0);
   Vec3 C = Vec3(0, 0, 0);
@@ -22,7 +21,8 @@ class Triangle : public BasePrimitive {
 
   Triangle() = default;
 
-  Triangle(const Vec3 &A, const Vec3 &B, const Vec3 &C, const Vec3 &N, const MatRef &mat);
+  Triangle(const Vec3 &A, const Vec3 &B, const Vec3 &C, const Vec3 &N,
+           const MatRef &mat);
 
   Vec3 normal(const Vec3 &P) override;
 

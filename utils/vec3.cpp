@@ -17,9 +17,7 @@ double Vec3::length() const {
   return sqrt(this->x * this->x + this->y * this->y + this->z * this->z);
 }
 
-Vec3 normalize(const Vec3 &v) {
-  return 1.0 / v.length() * v;
-}
+Vec3 normalize(const Vec3 &v) { return 1.0 / v.length() * v; }
 
 double dot(const Vec3 &a, const Vec3 &b) {
   return a.x * b.x + a.y * b.y + a.z * b.z;
@@ -31,7 +29,8 @@ double cos(const Vec3 &a, const Vec3 &b) {
 
 double pcos(const Vec3 &a, const Vec3 &b) {
   double cosValue = cos(a, b);
-  if (cosValue > 0) return cosValue;
+  if (cosValue > 0)
+    return cosValue;
   return 0;
 }
 

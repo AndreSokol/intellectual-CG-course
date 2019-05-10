@@ -1,7 +1,7 @@
 #pragma once
 
-#include <queue>
 #include <mutex>
+#include <queue>
 
 namespace render_queue {
 struct Task {
@@ -12,17 +12,17 @@ struct Task {
 };
 
 class Queue {
- public:
+public:
   Queue(int height, int width);
 
   bool pop(Task &);
 
   unsigned long size();
 
- private:
+private:
   void fill(int height, int width);
 
   std::queue<Task> _data;
   std::mutex _mutex;
 };
-}
+} // namespace render_queue

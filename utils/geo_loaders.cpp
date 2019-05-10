@@ -1,13 +1,14 @@
 #include "geo_loaders.hpp"
 
-#include <iostream>
 #include <fstream>
-#include <sstream>
-#include <vector>
+#include <iostream>
 #include <iterator>
+#include <sstream>
 #include <stdlib.h>
-#include "vec3.hpp"
+#include <vector>
+
 #include "../primitives/Triangle.hpp"
+#include "vec3.hpp"
 
 namespace geo_loaders {
 namespace {
@@ -29,9 +30,10 @@ int getFaceIndexes(const std::string &s, bool normal = false) {
   const auto &index_s = splitted.at(normal ? splitted.size() - 1 : 0);
   return std::stoi(index_s) - 1;
 }
-}
+} // namespace
 
-std::vector<TriangleRef> LoadObj(const std::string &filename, const Vec3 &pos, const MatRef &mat) {
+std::vector<TriangleRef> LoadObj(const std::string &filename, const Vec3 &pos,
+                                 const MatRef &mat) {
   std::ifstream file(filename);
   std::string line;
 
@@ -42,24 +44,19 @@ std::vector<TriangleRef> LoadObj(const std::string &filename, const Vec3 &pos, c
   std::cout << "### Reading: " << filename << std::endl;
 
   while (getline(file, line)) {
-    if (line[0] == '#') continue;
+    if (line[0] == '#')
+      continue;
 
     const auto &data = splitString(line);
 
     if (data[0] == "v") {
-      vertices.emplace_back(
-          std::stod(data[1]),
-          std::stod(data[2]),
-          std::stod(data[3])
-      );
+      vertices.emplace_back(std::stod(data[1]), std::stod(data[2]),
+                            std::stod(data[3]));
 
       std::cout << "v: vertices read " << vertices.size() << std::endl;
     } else if (data[0] == "vn") {
-      normals.emplace_back(
-          std::stod(data[1]),
-          std::stod(data[2]),
-          std::stod(data[3])
-      );
+      normals.emplace_back(std::stod(data[1]), std::stod(data[2]),
+                           std::stod(data[3]));
 
       std::cout << "vn: normals read " << normals.size() << std::endl;
     } else if (data[0] == "f") {
@@ -70,18 +67,12 @@ std::vector<TriangleRef> LoadObj(const std::string &filename, const Vec3 &pos, c
       int n = getFaceIndexes(data[1], true);
 
       tris.push_back(
-          std::make_shared<Triangle>(
-              vertices[a] + pos,
-              vertices[b] + pos,
-              vertices[c] + pos,
-              normals[n],
-              mat
-          )
-      );
+          std::make_shared<Triangle>(vertices[a] + pos, vertices[b] + pos,
+                                     vertices[c] + pos, normals[n], mat));
       std::cout << "f: tris read " << tris.size() << std::endl;
     }
   }
 
   return tris;
 }
-}
+} // namespace geo_loaders

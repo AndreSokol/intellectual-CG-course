@@ -1,12 +1,13 @@
 #pragma once
 
-#include "vec3.hpp"
-#include <limits>
-#include <cmath>
 #include <algorithm>
+#include <cmath>
+#include <limits>
+
+#include "vec3.hpp"
 
 class BBox {
- public:
+public:
   BBox() = default;
 
   Vec3 bbmin = Vec3{std::numeric_limits<double>::max(),
@@ -18,7 +19,7 @@ class BBox {
 
   inline bool isInside(const Vec3 &point) {
     return bbmin.x <= point.x && bbmin.y <= point.y && bbmin.z <= point.z &&
-        bbmax.x >= point.x && bbmax.y >= point.y && bbmax.z >= point.z;
+           bbmax.x >= point.x && bbmax.y >= point.y && bbmax.z >= point.z;
   }
 
   struct IntersectionData {

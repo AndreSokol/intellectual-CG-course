@@ -5,15 +5,12 @@
 #include <iostream>
 
 namespace render_queue {
-Queue::Queue(int height, int width) {
-  fill(height, width);
-}
+Queue::Queue(int height, int width) { fill(height, width); }
 
 void Queue::fill(int height, int width) {
   for (int i = 0; i * BLOCK_SIZE < width; i++) {
     for (int j = 0; j * BLOCK_SIZE < height; j++) {
-      _data.push(Task{i * BLOCK_SIZE,
-                      j * BLOCK_SIZE,
+      _data.push(Task{i * BLOCK_SIZE, j * BLOCK_SIZE,
                       std::min((i + 1) * BLOCK_SIZE, width),
                       std::min((j + 1) * BLOCK_SIZE, height)});
     }
@@ -34,7 +31,5 @@ bool Queue::pop(Task &task) {
   return true;
 }
 
-unsigned long Queue::size() {
-  return _data.size();
-}
-}
+unsigned long Queue::size() { return _data.size(); }
+} // namespace render_queue
