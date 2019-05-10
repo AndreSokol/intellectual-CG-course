@@ -21,6 +21,6 @@ file(GLOB HEADERS "*/*.hpp")
 message(sources ${SOURCES})
 message(headers ${HEADERS})
 
-add_executable(${PROJECT_NAME} main.cpp ${HEADERS} ${SOURCES} settings.cpp settings.hpp)
+add_executable(${PROJECT_NAME} main.cpp ${HEADERS} ${SOURCES})
 target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} Threads::Threads)
