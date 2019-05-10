@@ -1,5 +1,6 @@
 #pragma once
 
+#include <sstream>
 #include <stdint.h>
 
 #include "vec3.hpp"
@@ -11,7 +12,21 @@ public:
   Color(double x, double y, double z) : Vec3(x / 255.0, y / 255.0, z / 255.0){};
 
   Color(Vec3 vec) : Vec3(vec){};
-  // static Color fill(int R, int G, int B) {return Color()}
+
+  Color(const std::string &color_str) {
+    const auto s = color_str.substr(1);
+
+    int hex_color;
+    std::istringstream(s) >> std::hex >> hex_color;
+
+    int r = hex_color / 65536;
+    int g = (hex_color / 256) % 256;
+    int b = hex_color % 256;
+
+    x = (double)r / 255.0;
+    y = (double)g / 255.0;
+    z = (double)b / 255.0;
+  }
 
   Color &operator+=(const Color &other) {
     this->x += other.x;

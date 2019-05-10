@@ -13,7 +13,7 @@ void Settings::init_from_args(int argc, char **argv) {
     } else if (param_name == "-height") {
       std::cout << "setting HEIGHT = " << param_value << std::endl;
       HEIGHT = std::stoi(param_value);
-    } else if (param_name == "-block_size") {
+    } else if (param_name == "-block-size") {
       std::cout << "setting BLOCK_SIZE = " << param_value << std::endl;
       BLOCK_SIZE = std::stoi(param_value);
     } else if (param_name == "-ssaa") {
@@ -24,6 +24,9 @@ void Settings::init_from_args(int argc, char **argv) {
       std::cout << "setting SCALING_ENABLED = " << (param_value == "1")
                 << std::endl;
       SCALING_ENABLED = (bool)(param_value == "1");
+    } else if (param_name == "-background-color") {
+      std::cout << "setting BACKGROUND_COLOR = " << param_value << std::endl;
+      BACKGROUND_COLOR = Color(param_value);
     } else {
       std::cerr << "Unknown param " << param_name << std::endl;
     }
