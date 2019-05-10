@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include <vector>
 
-#include "../primitives/triangle.hpp"
-#include "vec3.hpp"
+#include <base/vec3.hpp>
+#include <primitives/triangle.hpp>
 
 namespace geo_loaders {
 namespace {

@@ -3,7 +3,7 @@
 #include <iostream>
 #include <limits>
 
-#include "bounding_box.hpp"
+#include <utils/bounding_box.hpp>
 
 struct BoxLessMax {
   BoxLessMax(int axis) : axis(axis) {}

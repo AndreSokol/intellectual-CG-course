@@ -1,4 +1,4 @@
-#include "SDL.h"
+#include <SDL.h>
 
 #include <algorithm>
 #include <chrono>
@@ -11,16 +11,16 @@
 #include <thread>
 #include <vector>
 
-#include "core/material.hpp"
-#include "core/point_light.hpp"
-#include "primitives/base_primitive.hpp"
-#include "primitives/sphere.hpp"
-#include "primitives/triangle.hpp"
-#include "settings.hpp"
-#include "utils/bvh.hpp"
-#include "utils/geo_loaders.hpp"
-#include "utils/task_queue.hpp"
-#include "utils/vec3.hpp"
+#include <base/vec3.hpp>
+#include <core/material.hpp>
+#include <core/point_light.hpp>
+#include <primitives/base_primitive.hpp>
+#include <primitives/sphere.hpp>
+#include <primitives/triangle.hpp>
+#include <settings.hpp>
+#include <utils/bvh.hpp>
+#include <utils/geo_loaders.hpp>
+#include <utils/task_queue.hpp>
 
 typedef PrimRef ptr;
 

@@ -3,8 +3,8 @@
 #include <memory>
 #include <vector>
 
-#include "../core/material.hpp"
-#include "../utils/color.hpp"
+#include <base/color.hpp>
+#include <core/material.hpp>
 
 class BasePrimitive {
 public:

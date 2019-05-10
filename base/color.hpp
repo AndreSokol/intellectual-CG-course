@@ -3,7 +3,7 @@
 #include <sstream>
 #include <stdint.h>
 
-#include "vec3.hpp"
+#include <base/vec3.hpp>
 
 class Color : public Vec3 {
 public:

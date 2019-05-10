@@ -13,13 +13,14 @@ include_directories(${SDL2_INCLUDE_DIRS})
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
+include_directories(${PROJECT_SOURCE_DIR})
+
 file(GLOB SOURCES "*/*.cpp")
 file(GLOB HEADERS "*/*.hpp")
 
 message(sources ${SOURCES})
 message(headers ${HEADERS})
 
-add_executable(${PROJECT_NAME} main.cpp ${HEADERS} ${SOURCES} primitives/triangle.cpp utils/bounding_box.cpp settings.cpp settings.hpp)
-#add_executable(${PROJECT_NAME} main.cpp utils/vec3.cpp utils/vec3.hpp primitives/Sphere.hpp utils/Color.hpp PointLight.hpp primitives/Triangle.hpp primitives/BasePrimitive.hpp gl_const.hpp Material.hpp utils/geo_loaders.cpp utils/geo_loaders.hpp utils/task_queue.cpp utils/task_queue.hpp utils/bvh.cpp utils/bvh.hpp utils/bounding_box.cpp utils/bounding_box.hpp)
+add_executable(${PROJECT_NAME} main.cpp ${HEADERS} ${SOURCES} settings.cpp settings.hpp)
 target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARIES})
 target_link_libraries(${PROJECT_NAME} Threads::Threads)

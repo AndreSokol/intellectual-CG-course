@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-#include "utils/color.hpp"
+#include "base/color.hpp"
 
 class Settings {
 public:

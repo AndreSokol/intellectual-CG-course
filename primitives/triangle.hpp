@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../core/gl_const.hpp"
-#include "../core/material.hpp"
-#include "../utils/bounding_box.hpp"
-#include "../utils/vec3.hpp"
-#include "base_primitive.hpp"
+#include <base/vec3.hpp>
+#include <core/gl_const.hpp>
+#include <core/material.hpp>
+#include <primitives/base_primitive.hpp>
+#include <utils/bounding_box.hpp>
 
 #include <algorithm>
 #include <memory>

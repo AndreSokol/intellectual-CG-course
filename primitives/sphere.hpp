@@ -4,9 +4,9 @@
 
 #include <math.h>
 
-#include "../core/gl_const.hpp"
-#include "../core/material.hpp"
-#include "../utils/vec3.hpp"
+#include <base/vec3.hpp>
+#include <core/gl_const.hpp>
+#include <core/material.hpp>
 
 class Sphere : public BasePrimitive {
 public:

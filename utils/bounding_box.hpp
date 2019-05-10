@@ -4,7 +4,7 @@
 #include <cmath>
 #include <limits>
 
-#include "vec3.hpp"
+#include <base/vec3.hpp>
 
 class BBox {
 public:
