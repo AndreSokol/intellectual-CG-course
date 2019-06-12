@@ -69,18 +69,7 @@ void SamplerRenderer::renderPixel(render_queue::Queue &rqueue, const Vec3 &O,
           c += 0.25 * traceRay(O, normalize(R));
         }
 
-        draw_mutex.lock();
-        SDL_SetRenderDrawColor(_renderer, c.r(), c.g(), c.b(),
-                               SDL_ALPHA_OPAQUE);
-        if (settings->SCALING_ENABLED) {
-          SDL_RenderDrawPoint(_renderer, 2 * i, 2 * j);
-          SDL_RenderDrawPoint(_renderer, 2 * i + 1, 2 * j);
-          SDL_RenderDrawPoint(_renderer, 2 * i, 2 * j + 1);
-          SDL_RenderDrawPoint(_renderer, 2 * i + 1, 2 * j + 1);
-        } else {
-          SDL_RenderDrawPoint(_renderer, i, j);
-        }
-        draw_mutex.unlock();
+        putPixel(i, j, c);
       }
     }
   }

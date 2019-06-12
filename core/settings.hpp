@@ -2,10 +2,10 @@
 
 #include <algorithm>
 
-#include "base/color.hpp"
+#include <base/color.hpp>
 
 class Settings {
-public:
+ public:
   int WIDTH = 480;
   int HEIGHT = 320;
   int BIGGEST_WINDOW_SIZE = std::max(WIDTH, HEIGHT);

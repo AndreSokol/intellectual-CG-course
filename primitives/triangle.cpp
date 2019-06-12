@@ -1,7 +1,8 @@
+#include <renderers/base_renderer.hpp>
 #include "triangle.hpp"
 
 Triangle::Triangle(const Vec3 &A, const Vec3 &B, const Vec3 &C, const Vec3 &N,
-                   const MatRef &mat) {
+                   const MatRef &mat) : BasePrimitive(mat) {
   this->A = A;
   this->B = B;
   this->C = C;
@@ -59,7 +60,7 @@ bool Triangle::intersect(const Vec3 &O, const Vec3 &R, double &t) {
 
 double Triangle::matrixDet(const Vec3 &I, const Vec3 &J, const Vec3 &K) {
   return I.x * J.y * K.z + J.x * K.y * I.z + K.x * I.y * J.z -
-         (I.x * K.y * J.z + J.x * I.y * K.z + K.x * J.y * I.z);
+      (I.x * K.y * J.z + J.x * I.y * K.z + K.x * J.y * I.z);
 }
 
 std::ostream &operator<<(std::ostream &os, TriangleRef &t) {

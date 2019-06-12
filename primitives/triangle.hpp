@@ -11,15 +11,15 @@
 #include <vector>
 
 class Triangle : public BasePrimitive {
-private:
-public:
+ private:
+ public:
   Vec3 A = Vec3(0, 0, 0);
   Vec3 B = Vec3(0, 0, 0);
   Vec3 C = Vec3(0, 0, 0);
   Vec3 N = Vec3(1, 0, 0);
   BBox box;
 
-  Triangle() = default;
+//  Triangle() = default;
 
   Triangle(const Vec3 &A, const Vec3 &B, const Vec3 &C, const Vec3 &N,
            const MatRef &mat);

@@ -9,13 +9,14 @@
 #include <core/material.hpp>
 
 class Sphere : public BasePrimitive {
-public:
+ public:
   Vec3 center = Vec3(0, 0, 0);
   double radius = 0;
 
-  Sphere() = default;
+//  Sphere() = default;
 
-  Sphere(const Vec3 &center, const double &radius, const MatRef &mat) {
+  Sphere(const Vec3 &center, const double &radius, const MatRef &mat)
+      : BasePrimitive(mat) {
     this->center = center;
     this->radius = radius;
     this->mat = mat;
@@ -26,8 +27,9 @@ public:
   bool intersect(const Vec3 &O, const Vec3 &R, double &t) override {
     Vec3 C = O - this->center;
 
-    double k1 = dot(R, R), k2 = 2 * dot(C, R),
-           k3 = dot(C, C) - this->radius * this->radius;
+    double k1 = dot(R, R);
+    double k2 = 2 * dot(C, R);
+    double k3 = dot(C, C) - this->radius * this->radius;
 
     double det = k2 * k2 - 4 * k1 * k3;
     if (det < 0)
@@ -49,3 +51,5 @@ public:
     return false;
   }
 };
+
+typedef std::shared_ptr<Sphere> SphereRef;
