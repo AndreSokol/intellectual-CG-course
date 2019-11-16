@@ -6,7 +6,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -O1")
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
-find_package(GLEW 3.3 REQUIRED)
+find_package(GLEW 2.1 REQUIRED)
 
 # GLFW
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
@@ -17,8 +17,8 @@ add_subdirectory(glfw)
 
 include_directories(${PROJECT_SOURCE_DIR})
 
-#file(GLOB SOURCES "*/*.cpp")
-#file(GLOB HEADERS "*/*.hpp")
+file(GLOB SOURCES "*/*.cpp")
+file(GLOB HEADERS "*/*.hpp")
 
 message(sources ${SOURCES})
 message(headers ${HEADERS})

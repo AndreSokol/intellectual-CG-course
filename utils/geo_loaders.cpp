@@ -75,4 +75,5 @@ std::vector<TriangleRef> LoadObj(const std::string &filename, const Vec3 &pos,
 
   return tris;
 }
+
 } // namespace geo_loaders

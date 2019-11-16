@@ -14,7 +14,16 @@
 
 // std::shared_ptr<BaseRenderer> m_renderer;
 
+#include <shaders/shader.hpp>
+
 GLfloat vertices[] = {-0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.0f};
+
+const std::string kShaderFragment{
+    "/home/andresokol/Documents/intellectual-CG-course/"
+    "shaders/fragment/basic.glsl"};
+const std::string kShaderVertex{
+    "/home/andresokol/Documents/intellectual-CG-course/"
+    "shaders/vertex/basic.glsl"};
 
 int main(int argc, char *argv[]) {
   glfwInit();
@@ -48,7 +57,7 @@ int main(int argc, char *argv[]) {
     glfwPollEvents();
 
     // Wireframe
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    //    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -62,16 +71,8 @@ int main(int argc, char *argv[]) {
     GLuint vertexShader;
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
 
-    const auto vertexShaderSource =
-        "#version 330 core\n"
-        "\n"
-        "layout (location = 0) in vec3 position;\n"
-        "\n"
-        "void main()\n"
-        "{\n"
-        "    gl_Position = vec4(position.x, position.y, position.z, 1.0);\n"
-        "}";
-
+    const auto &vertexShaderStr = shader::Read(kShaderVertex);
+    const auto vertexShaderSource = vertexShaderStr.c_str();
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
     glCompileShader(vertexShader);
 
@@ -84,15 +85,8 @@ int main(int argc, char *argv[]) {
                 << infoLog << std::endl;
     }
 
-    const auto fragmentShaderSource =
-        "#version 330 core\n"
-        "\n"
-        "out vec4 color;\n"
-        "\n"
-        "void main()\n"
-        "{\n"
-        "\tcolor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-        "}";
+    const auto &fragmentShaderStr = shader::Read(kShaderFragment);
+    const auto fragmentShaderSource = fragmentShaderStr.c_str();
 
     GLuint fragmentShader;
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
